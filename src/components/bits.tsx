@@ -76,10 +76,6 @@ export function LikeButton({ type, id, count, liked, onChange }: { type: TargetT
   const { user, requireAuth } = useAuth();
   const [state, setState] = useState({ liked, count });
   const [busy, setBusy] = useState(false);
-  // keep in sync when props change
-  if (!busy && (state.liked !== liked && state.count === count)) {
-    // initial props arrived later
-  }
   const toggle = async () => {
     if (!requireAuth("Sign in to like contributions")) return;
     if (busy) return;
