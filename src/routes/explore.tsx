@@ -4,7 +4,7 @@ import { getTrending } from "@/lib/tmdb.functions";
 import { TitleGrid } from "@/components/title-grid";
 import { Page } from "@/components/shell";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CollectionsGrid } from "./collections.index";
+import { CollectionsGrid } from "@/components/collections";
 
 export const Route = createFileRoute("/explore")({
   head: () => ({
