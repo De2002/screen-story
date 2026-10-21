@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChevronDown, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,7 +13,6 @@ import { PostFeed, QuestionList, ReviewList, postsKey } from "./feeds";
 import { cn } from "@/lib/utils";
 
 export function TitlePage({ t, tab }: { t: TitleDetail; tab: TabKey }) {
-  const navigate = useNavigate();
   const qc = useQueryClient();
   const { user } = useAuth();
   const [about, setAbout] = useState(false);
@@ -115,7 +114,6 @@ export function TitlePage({ t, tab }: { t: TitleDetail; tab: TabKey }) {
           </>
         )}
       </section>
-      <span className="hidden">{String(!!navigate)}</span>
     </div>
   );
 }
