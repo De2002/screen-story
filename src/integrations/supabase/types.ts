@@ -14,16 +14,666 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      answers: {
+        Row: {
+          body: string
+          created_at: string
+          helpful: boolean
+          id: string
+          like_count: number
+          question_id: string
+          removed: boolean
+          reply_count: number
+          spoiler: boolean
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          helpful?: boolean
+          id?: string
+          like_count?: number
+          question_id: string
+          removed?: boolean
+          reply_count?: number
+          spoiler?: boolean
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          helpful?: boolean
+          id?: string
+          like_count?: number
+          question_id?: string
+          removed?: boolean
+          reply_count?: number
+          spoiler?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "answers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collection_items: {
+        Row: {
+          added_at: string
+          collection_id: string
+          position: number
+          title_id: string
+        }
+        Insert: {
+          added_at?: string
+          collection_id: string
+          position?: number
+          title_id: string
+        }
+        Update: {
+          added_at?: string
+          collection_id?: string
+          position?: number
+          title_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_items_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_items_title_id_fkey"
+            columns: ["title_id"]
+            isOneToOne: false
+            referencedRelation: "titles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collections: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          removed: boolean
+          slug: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          removed?: boolean
+          slug: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          removed?: boolean
+          slug?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collections_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      library: {
+        Row: {
+          created_at: string
+          status: string
+          title_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          status: string
+          title_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          status?: string
+          title_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_title_id_fkey"
+            columns: ["title_id"]
+            isOneToOne: false
+            referencedRelation: "titles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      likes: {
+        Row: {
+          created_at: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          target_id?: string
+          target_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "likes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      moderation_log: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          id: string
+          note: string | null
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_log_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          body: string
+          category: Database["public"]["Enums"]["post_category"]
+          created_at: string
+          episode: number | null
+          explanation: string | null
+          id: string
+          like_count: number
+          quote_character: string | null
+          removed: boolean
+          reply_count: number
+          season: number | null
+          spoiler: boolean
+          title_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          category: Database["public"]["Enums"]["post_category"]
+          created_at?: string
+          episode?: number | null
+          explanation?: string | null
+          id?: string
+          like_count?: number
+          quote_character?: string | null
+          removed?: boolean
+          reply_count?: number
+          season?: number | null
+          spoiler?: boolean
+          title_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          category?: Database["public"]["Enums"]["post_category"]
+          created_at?: string
+          episode?: number | null
+          explanation?: string | null
+          id?: string
+          like_count?: number
+          quote_character?: string | null
+          removed?: boolean
+          reply_count?: number
+          season?: number | null
+          spoiler?: boolean
+          title_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_title_id_fkey"
+            columns: ["title_id"]
+            isOneToOne: false
+            referencedRelation: "titles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string
+          created_at: string
+          display_name: string
+          id: string
+          status: Database["public"]["Enums"]["account_status"]
+          username: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string
+          created_at?: string
+          display_name?: string
+          id: string
+          status?: Database["public"]["Enums"]["account_status"]
+          username: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string
+          created_at?: string
+          display_name?: string
+          id?: string
+          status?: Database["public"]["Enums"]["account_status"]
+          username?: string
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          answer_count: number
+          created_at: string
+          details: string | null
+          episode: number | null
+          id: string
+          like_count: number
+          question: string
+          removed: boolean
+          season: number | null
+          spoiler: boolean
+          title_id: string
+          user_id: string
+        }
+        Insert: {
+          answer_count?: number
+          created_at?: string
+          details?: string | null
+          episode?: number | null
+          id?: string
+          like_count?: number
+          question: string
+          removed?: boolean
+          season?: number | null
+          spoiler?: boolean
+          title_id: string
+          user_id: string
+        }
+        Update: {
+          answer_count?: number
+          created_at?: string
+          details?: string | null
+          episode?: number | null
+          id?: string
+          like_count?: number
+          question?: string
+          removed?: boolean
+          season?: number | null
+          spoiler?: boolean
+          title_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_title_id_fkey"
+            columns: ["title_id"]
+            isOneToOne: false
+            referencedRelation: "titles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "questions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      replies: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          parent_id: string
+          parent_type: string
+          removed: boolean
+          spoiler: boolean
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          parent_id: string
+          parent_type: string
+          removed?: boolean
+          spoiler?: boolean
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          parent_id?: string
+          parent_type?: string
+          removed?: boolean
+          spoiler?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "replies_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reports: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string
+          reporter_id: string
+          status: string
+          target_id: string | null
+          target_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason: string
+          reporter_id: string
+          status?: string
+          target_id?: string | null
+          target_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string
+          reporter_id?: string
+          status?: string
+          target_id?: string | null
+          target_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          body: string
+          created_at: string
+          heading: string | null
+          id: string
+          like_count: number
+          removed: boolean
+          reply_count: number
+          spoiler: boolean
+          title_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          heading?: string | null
+          id?: string
+          like_count?: number
+          removed?: boolean
+          reply_count?: number
+          spoiler?: boolean
+          title_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          heading?: string | null
+          id?: string
+          like_count?: number
+          removed?: boolean
+          reply_count?: number
+          spoiler?: boolean
+          title_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_title_id_fkey"
+            columns: ["title_id"]
+            isOneToOne: false
+            referencedRelation: "titles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_collections: {
+        Row: {
+          collection_id: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          collection_id: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          collection_id?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_collections_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_collections_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      titles: {
+        Row: {
+          genres: string[]
+          id: string
+          kind: string
+          poster_path: string | null
+          slug: string
+          title: string
+          tmdb_id: number
+          updated_at: string
+          year: number | null
+        }
+        Insert: {
+          genres?: string[]
+          id: string
+          kind: string
+          poster_path?: string | null
+          slug: string
+          title: string
+          tmdb_id: number
+          updated_at?: string
+          year?: number | null
+        }
+        Update: {
+          genres?: string[]
+          id?: string
+          kind?: string
+          poster_path?: string | null
+          slug?: string
+          title?: string
+          tmdb_id?: number
+          updated_at?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      can_write: { Args: { _user_id: string }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      mark_helpful: {
+        Args: { _answer_id: string; _value: boolean }
+        Returns: undefined
+      }
+      owns_collection: { Args: { _cid: string }; Returns: boolean }
+      search_collections: {
+        Args: { q: string }
+        Returns: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          removed: boolean
+          slug: string
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "collections"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
-      [_ in never]: never
+      account_status: "active" | "restricted" | "suspended" | "banned"
+      app_role: "admin" | "moderator" | "user"
+      post_category: "lesson" | "quote" | "moment" | "trailer_thought"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +800,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      account_status: ["active", "restricted", "suspended", "banned"],
+      app_role: ["admin", "moderator", "user"],
+      post_category: ["lesson", "quote", "moment", "trailer_thought"],
+    },
   },
 } as const
