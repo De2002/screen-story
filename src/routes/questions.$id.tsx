@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, MessageCircle } from "lucide-react";
 import { useState } from "react";
@@ -34,7 +34,7 @@ function QuestionPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from("questions").select(`*, ${AUTHOR}, ${TITLE}`).eq("id", id).maybeSingle();
       if (error) throw error;
-      if (!data) throw notFound();
+      if (!data) return null;
       const qs = data as unknown as Question;
       const { data: ans } = await supabase.from("answers").select(`*, ${AUTHOR}`).eq("question_id", id).eq("removed", false)
         .order("helpful", { ascending: false }).order("like_count", { ascending: false }).order("created_at");
