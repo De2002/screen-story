@@ -10,17 +10,35 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as GuidelinesRouteImport } from './routes/guidelines'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as CollectionsIndexRouteImport } from './routes/collections.index'
+import { Route as CollectionsSlugRouteImport } from './routes/collections.$slug'
 import { Route as MovieSlugRouteImport } from './routes/movie.$slug'
 import { Route as QuestionsIdRouteImport } from './routes/questions.$id'
 import { Route as ReviewsIdRouteImport } from './routes/reviews.$id'
 import { Route as SeriesSlugRouteImport } from './routes/series.$slug'
+import { Route as UUsernameRouteImport } from './routes/u.$username'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExploreRoute = ExploreRouteImport.update({
@@ -28,14 +46,44 @@ const ExploreRoute = ExploreRouteImport.update({
   path: '/explore',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuidelinesRoute = GuidelinesRouteImport.update({
+  id: '/guidelines',
+  path: '/guidelines',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const CollectionsIndexRoute = CollectionsIndexRouteImport.update({
   id: '/collections/',
   path: '/collections/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectionsSlugRoute = CollectionsSlugRouteImport.update({
+  id: '/collections/$slug',
+  path: '/collections/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MovieSlugRoute = MovieSlugRouteImport.update({
@@ -58,79 +106,140 @@ const SeriesSlugRoute = SeriesSlugRouteImport.update({
   path: '/series/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UUsernameRoute = UUsernameRouteImport.update({
+  id: '/u/$username',
+  path: '/u/$username',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
+  '/guidelines': typeof GuidelinesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/library': typeof AuthenticatedLibraryRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
   '/movie/$slug': typeof MovieSlugRoute
   '/questions/$id': typeof QuestionsIdRoute
   '/reviews/$id': typeof ReviewsIdRoute
   '/series/$slug': typeof SeriesSlugRoute
+  '/u/$username': typeof UUsernameRoute
   '/collections/': typeof CollectionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
+  '/guidelines': typeof GuidelinesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/library': typeof AuthenticatedLibraryRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
   '/movie/$slug': typeof MovieSlugRoute
   '/questions/$id': typeof QuestionsIdRoute
   '/reviews/$id': typeof ReviewsIdRoute
   '/series/$slug': typeof SeriesSlugRoute
+  '/u/$username': typeof UUsernameRoute
   '/collections': typeof CollectionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/explore': typeof ExploreRoute
+  '/guidelines': typeof GuidelinesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/library': typeof AuthenticatedLibraryRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/collections/$slug': typeof CollectionsSlugRoute
   '/movie/$slug': typeof MovieSlugRoute
   '/questions/$id': typeof QuestionsIdRoute
   '/reviews/$id': typeof ReviewsIdRoute
   '/series/$slug': typeof SeriesSlugRoute
+  '/u/$username': typeof UUsernameRoute
   '/collections/': typeof CollectionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/explore'
+    | '/guidelines'
+    | '/reset-password'
     | '/search'
+    | '/admin'
+    | '/library'
+    | '/settings'
+    | '/collections/$slug'
     | '/movie/$slug'
     | '/questions/$id'
     | '/reviews/$id'
     | '/series/$slug'
+    | '/u/$username'
     | '/collections/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/explore'
+    | '/guidelines'
+    | '/reset-password'
     | '/search'
+    | '/admin'
+    | '/library'
+    | '/settings'
+    | '/collections/$slug'
     | '/movie/$slug'
     | '/questions/$id'
     | '/reviews/$id'
     | '/series/$slug'
+    | '/u/$username'
     | '/collections'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/auth'
     | '/explore'
+    | '/guidelines'
+    | '/reset-password'
     | '/search'
+    | '/_authenticated/admin'
+    | '/_authenticated/library'
+    | '/_authenticated/settings'
+    | '/collections/$slug'
     | '/movie/$slug'
     | '/questions/$id'
     | '/reviews/$id'
     | '/series/$slug'
+    | '/u/$username'
     | '/collections/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   ExploreRoute: typeof ExploreRoute
+  GuidelinesRoute: typeof GuidelinesRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
+  CollectionsSlugRoute: typeof CollectionsSlugRoute
   MovieSlugRoute: typeof MovieSlugRoute
   QuestionsIdRoute: typeof QuestionsIdRoute
   ReviewsIdRoute: typeof ReviewsIdRoute
   SeriesSlugRoute: typeof SeriesSlugRoute
+  UUsernameRoute: typeof UUsernameRoute
   CollectionsIndexRoute: typeof CollectionsIndexRoute
 }
 
@@ -143,11 +252,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/explore': {
       id: '/explore'
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guidelines': {
+      id: '/guidelines'
+      path: '/guidelines'
+      fullPath: '/guidelines'
+      preLoaderRoute: typeof GuidelinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -157,11 +294,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/library': {
+      id: '/_authenticated/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof AuthenticatedLibraryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/collections/': {
       id: '/collections/'
       path: '/collections'
       fullPath: '/collections/'
       preLoaderRoute: typeof CollectionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections/$slug': {
+      id: '/collections/$slug'
+      path: '/collections/$slug'
+      fullPath: '/collections/$slug'
+      preLoaderRoute: typeof CollectionsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/movie/$slug': {
@@ -192,17 +357,45 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SeriesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/u/$username': {
+      id: '/u/$username'
+      path: '/u/$username'
+      fullPath: '/u/$username'
+      preLoaderRoute: typeof UUsernameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   ExploreRoute: ExploreRoute,
+  GuidelinesRoute: GuidelinesRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
+  CollectionsSlugRoute: CollectionsSlugRoute,
   MovieSlugRoute: MovieSlugRoute,
   QuestionsIdRoute: QuestionsIdRoute,
   ReviewsIdRoute: ReviewsIdRoute,
   SeriesSlugRoute: SeriesSlugRoute,
+  UUsernameRoute: UUsernameRoute,
   CollectionsIndexRoute: CollectionsIndexRoute,
 }
 export const routeTree = rootRouteImport
