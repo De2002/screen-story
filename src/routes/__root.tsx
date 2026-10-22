@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ClerkProvider } from "@clerk/tanstack-react-start";
 import {
   Outlet,
   Link,
@@ -92,12 +93,14 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AppShell>
-          <Outlet />
-        </AppShell>
-        <Toaster position="top-center" />
-      </AuthProvider>
+      <ClerkProvider>
+        <AuthProvider>
+          <AppShell>
+            <Outlet />
+          </AppShell>
+          <Toaster position="top-center" />
+        </AuthProvider>
+      </ClerkProvider>
     </QueryClientProvider>
   );
 }

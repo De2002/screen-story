@@ -1,7 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
-import type { User } from "@supabase/supabase-js";
+import { useAuth as useClerkAuth, useUser } from "@clerk/tanstack-react-start";
 import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { ensureProfile } from "@/lib/d1.server";
+
+export type User = { id: string; primaryEmailAddress?: { emailAddress: string } | null };
 
 export type Profile = {
   id: string;
@@ -28,11 +30,13 @@ const Ctx = createContext<AuthCtx | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const qc = useQueryClient();
+  const { isLoaded, isSignedIn } = useClerkAuth();
+  const { user: clerkUser } = useUser();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [ready, setReady] = useState(false);
   const [promptReason, setPromptReason] = useState<string | null>(null);
+  const ready = isLoaded;
 
   const load = useCallback(async (u: User | null) => {
     setUser(u);
@@ -41,25 +45,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAdmin(false);
       return;
     }
-    const [{ data: p }, { data: roles }] = await Promise.all([
-      supabase.from("profiles").select("*").eq("id", u.id).maybeSingle(),
-      supabase.from("user_roles").select("role").eq("user_id", u.id),
-    ]);
-    setProfile((p as Profile) ?? null);
-    setIsAdmin(!!roles?.some((r) => r.role === "admin"));
+    const p = await ensureProfile();
+    setProfile(p as Profile);
+    setIsAdmin(false);
   }, []);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED" || event === "INITIAL_SESSION") {
-        setTimeout(() => {
-          load(session?.user ?? null).finally(() => setReady(true));
-          if (event === "SIGNED_IN" || event === "SIGNED_OUT") qc.invalidateQueries();
-        }, 0);
-      }
-    });
-    return () => sub.subscription.unsubscribe();
-  }, [load, qc]);
+    if (!isLoaded) return;
+    const u = isSignedIn && clerkUser ? {
+      id: clerkUser.id,
+      primaryEmailAddress: clerkUser.primaryEmailAddress,
+    } : null;
+    load(u).catch((error) => console.error("[v0] Failed to provision Clerk profile", error));
+    qc.invalidateQueries();
+  }, [clerkUser, isLoaded, isSignedIn, load, qc]);
 
   const requireAuth = useCallback(
     (reason?: string) => {
