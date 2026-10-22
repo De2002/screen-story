@@ -66,7 +66,7 @@ export function TitlePage({ t, tab }: { t: TitleDetail; tab: TabKey }) {
         <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 border-t pt-4 text-sm">
           {t.tagline && <><dt className="text-muted-foreground">Tagline</dt><dd className="italic">{t.tagline}</dd></>}
           {t.creators.length > 0 && <><dt className="text-muted-foreground">{t.kind === "movie" ? "Director" : "Created by"}</dt><dd>{t.creators.join(", ")}</dd></>}
-          {t.cast.length > 0 && <><dt className="text-muted-foreground">Cast</dt><dd>{t.cast.map((c) => c.name).join(", ")}</dd></>}
+          {t.cast.length > 0 && <><dt className="text-muted-foreground">Cast</dt><dd>{t.cast.map((c: { name: string }) => c.name).join(", ")}</dd></>}
           {t.runtime && <><dt className="text-muted-foreground">Runtime</dt><dd>{t.runtime} min</dd></>}
           {t.seasons && <><dt className="text-muted-foreground">Seasons</dt><dd>{t.seasons} ({t.episodes} episodes)</dd></>}
           {t.status && <><dt className="text-muted-foreground">Status</dt><dd>{t.status}</dd></>}
