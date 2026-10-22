@@ -116,7 +116,7 @@ export function ShareButton({ path, label = "Share" }: { path: string; label?: s
   );
 }
 
-const TABLE: Record<string, "posts" | "reviews" | "questions" | "answers" | "replies"> = {
+const TABLE: Record<"post" | "review" | "question" | "answer" | "reply", "posts" | "reviews" | "questions" | "answers" | "replies"> = {
   post: "posts", review: "reviews", question: "questions", answer: "answers", reply: "replies",
 };
 
