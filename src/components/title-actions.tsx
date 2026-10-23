@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Eye, Plus, Bookmark } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { collectionSlug } from "@/lib/community";
+import { addCollectionItem } from "@/lib/collection-items";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -17,18 +18,19 @@ export function TitleActions({ titleId }: { titleId: string }) {
     queryKey: ["library-status", titleId, user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase.from("library").select("status").eq("user_id", user!.id).eq("title_id", titleId).maybeSingle();
+      if (!user) return null;
+      const { data } = await supabase.from("library").select("status").eq("user_id", user.id).eq("title_id", titleId).maybeSingle();
       return (data?.status as "watched" | "want" | undefined) ?? null;
     },
   });
   const set = async (s: "watched" | "want") => {
-    if (!requireAuth(s === "watched" ? "Sign in to track what you've watched" : "Sign in to build your watchlist")) return;
+    if (!requireAuth(s === "watched" ? "Sign in to track what you've watched" : "Sign in to build your watchlist") || !user) return;
     const current = status.data;
-    qc.setQueryData(["library-status", titleId, user!.id], current === s ? null : s);
+    qc.setQueryData(["library-status", titleId, user.id], current === s ? null : s);
     const res = current === s
-      ? await supabase.from("library").delete().match({ user_id: user!.id, title_id: titleId })
-      : await supabase.from("library").upsert({ user_id: user!.id, title_id: titleId, status: s });
-    if (res.error) { toast.error("Couldn't update your library."); qc.setQueryData(["library-status", titleId, user!.id], current); }
+      ? await supabase.from("library").delete().match({ user_id: user.id, title_id: titleId })
+      : await supabase.from("library").upsert({ user_id: user.id, title_id: titleId, status: s });
+    if (res.error) { toast.error("Couldn't update your library."); qc.setQueryData(["library-status", titleId, user.id], current); }
     qc.invalidateQueries({ queryKey: ["library"] });
   };
   const s = status.data;
@@ -51,30 +53,66 @@ export function TitleActions({ titleId }: { titleId: string }) {
 function AddToCollection({ open, onOpenChange, titleId }: { open: boolean; onOpenChange: (o: boolean) => void; titleId: string }) {
   const { user } = useAuth();
   const [name, setName] = useState("");
+  const [pending, setPending] = useState(false);
+  const busy = useRef(false);
+  const qc = useQueryClient();
   const lists = useQuery({
-    queryKey: ["my-collections", user!.id, titleId],
-    enabled: open,
+    queryKey: ["my-collections", user?.id, titleId],
+    enabled: open && !!user,
     queryFn: async () => {
-      const { data } = await supabase.from("collections").select("id, name, collection_items(title_id)").eq("user_id", user!.id).order("updated_at", { ascending: false });
+      if (!user) return [];
+      const { data, error } = await supabase.from("collections").select("id, name, collection_items(title_id)").eq("user_id", user.id).eq("removed", false).order("updated_at", { ascending: false });
+      if (error) throw error;
       return (data ?? []).map((c: any) => ({ id: c.id as string, name: c.name as string, has: (c.collection_items ?? []).some((i: any) => i.title_id === titleId), count: (c.collection_items ?? []).length }));
     },
   });
+  const refresh = async () => {
+    await Promise.all([
+      lists.refetch(),
+      qc.invalidateQueries({ queryKey: ["collections"] }),
+      qc.invalidateQueries({ queryKey: ["collection"] }),
+    ]);
+  };
   const toggle = async (c: { id: string; has: boolean; count: number }) => {
-    const res = c.has
-      ? await supabase.from("collection_items").delete().match({ collection_id: c.id, title_id: titleId })
-      : await supabase.from("collection_items").insert({ collection_id: c.id, title_id: titleId, position: c.count });
-    if (res.error) toast.error("Couldn't update collection.");
-    await supabase.from("collections").update({ updated_at: new Date().toISOString() }).eq("id", c.id);
-    lists.refetch();
+    if (busy.current || !user) return;
+    busy.current = true;
+    setPending(true);
+    try {
+      if (c.has) {
+        const { error } = await supabase.from("collection_items").delete().match({ collection_id: c.id, title_id: titleId });
+        if (error) throw error;
+      } else {
+        await addCollectionItem(c.id, titleId, c.count);
+      }
+      const { error } = await supabase.from("collections").update({ updated_at: new Date().toISOString() }).eq("id", c.id);
+      if (error) throw error;
+    } catch {
+      toast.error("Couldn't update collection. Please try again.");
+    } finally {
+      await refresh();
+      busy.current = false;
+      setPending(false);
+    }
   };
   const create = async () => {
-    if (!name.trim()) return;
-    const { data, error } = await supabase.from("collections").insert({ name: name.trim(), slug: collectionSlug(name), user_id: user!.id }).select("id").single();
-    if (error || !data) { toast.error("Couldn't create collection."); return; }
-    await supabase.from("collection_items").insert({ collection_id: data.id, title_id: titleId, position: 0 });
-    setName("");
-    toast.success("Added to your new collection");
-    lists.refetch();
+    if (!name.trim() || !user || busy.current) return;
+    busy.current = true;
+    setPending(true);
+    let created = false;
+    try {
+      const { data, error } = await supabase.from("collections").insert({ name: name.trim(), slug: collectionSlug(name), user_id: user.id }).select("id").single();
+      if (error || !data) throw error ?? new Error("Collection not created");
+      created = true;
+      setName("");
+      await addCollectionItem(data.id, titleId, 0);
+      toast.success("Added to your new collection");
+    } catch {
+      toast.error(created ? "Collection created, but the title wasn't added. Please try adding it again." : "Couldn't create collection. Please try again.");
+    } finally {
+      await refresh();
+      busy.current = false;
+      setPending(false);
+    }
   };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -83,16 +121,17 @@ function AddToCollection({ open, onOpenChange, titleId }: { open: boolean; onOpe
         <ul className="max-h-64 divide-y overflow-auto">
           {(lists.data ?? []).map((c) => (
             <li key={c.id}>
-              <button onClick={() => toggle(c)} className="flex w-full items-center justify-between py-2.5 text-left text-sm">
+              <Button variant="ghost" disabled={pending} aria-pressed={c.has} onClick={() => toggle(c)} className="h-auto w-full justify-between whitespace-normal py-2.5 text-left text-sm">
                 <span>{c.name}</span>{c.has && <Check className="size-4 text-ember" />}
-              </button>
+              </Button>
             </li>
           ))}
           {lists.data?.length === 0 && <li className="py-2 text-sm text-muted-foreground">No collections yet.</li>}
+          {lists.isError && <li className="py-2 text-sm text-destructive">Couldn't load your collections.</li>}
         </ul>
         <div className="flex gap-2">
-          <Input placeholder="New collection name" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} onKeyDown={(e) => e.key === "Enter" && create()} />
-          <Button onClick={create} disabled={!name.trim()}>Create</Button>
+          <Input placeholder="New collection name" disabled={pending} value={name} onChange={(e) => setName(e.target.value)} maxLength={120} onKeyDown={(e) => e.key === "Enter" && create()} />
+          <Button onClick={create} disabled={pending || !name.trim()}>Create</Button>
         </div>
       </DialogContent>
     </Dialog>
