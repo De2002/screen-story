@@ -16,7 +16,15 @@ export async function loadTitle(kind: Kind, slug: string) {
 }
 
 export function titleHead(t: TitleDetail | undefined) {
-  if (!t) return { meta: [{ title: "Not found — Scruttin" }, { name: "robots", content: "noindex" }] };
+  if (!t) return { meta: [
+    { title: "Title not found — Scruttin" },
+    { name: "description", content: "This movie or series could not be found on Scruttin." },
+    { property: "og:title", content: "Title not found — Scruttin" },
+    { property: "og:description", content: "This movie or series could not be found on Scruttin." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex" },
+  ] };
   const name = `${t.title}${t.year ? ` (${t.year})` : ""}`;
   const desc = `Lessons, quotes, reviews and questions about ${name} from everyday viewers on Scruttin.`;
   const img = posterUrl(t.posterPath, "w780");
