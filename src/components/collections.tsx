@@ -11,14 +11,14 @@ export type CollectionCard = {
   collection_items: { position: number; title: { poster_path: string | null } | null }[];
 };
 
-export const COLLECTION_SELECT = "id, slug, name, description, updated_at, author:profiles!inner(username, display_name), collection_items(position, title:titles(poster_path))";
+export const COLLECTION_SELECT = "id, slug, name, description, updated_at, author:profiles!collections_user_id_fkey!inner(username, display_name), collection_items(position, title:titles(poster_path))";
 
 export function Cover({ items }: { items: CollectionCard["collection_items"] }) {
   const posters = [...items].sort((a, b) => a.position - b.position).map((i) => i.title?.poster_path).filter(Boolean).slice(0, 4) as string[];
   return (
     <div className="grid aspect-[4/3] grid-cols-4 gap-0.5 overflow-hidden rounded-md bg-muted">
       {posters.length === 0 ? <div className="col-span-4" /> : posters.map((p, i) => (
-        <img key={i} src={posterUrl(p, "w185")!} alt="" loading="lazy" className="h-full w-full object-cover" />
+        <img key={i} src={posterUrl(p, "w185") ?? undefined} alt="" loading="lazy" className="h-full w-full object-cover" />
       ))}
     </div>
   );
@@ -47,6 +47,7 @@ export function CollectionsGrid({ limit = 24, userId, ids }: { limit?: number; u
     },
   });
   if (q.isLoading) return <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">{[0, 1, 2].map((i) => <Skeleton key={i} className="aspect-[4/3]" />)}</div>;
+  if (q.isError) return <Empty title="Couldn't load collections">Please try again.</Empty>;
   if (!q.data?.length) return <Empty title="No collections yet">Open any movie and choose “Add to collection” to start one.</Empty>;
   return <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">{q.data.map((c) => <CollectionTile key={c.id} c={c} />)}</div>;
 }

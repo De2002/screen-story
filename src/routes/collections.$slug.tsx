@@ -38,9 +38,10 @@ function CollectionPage() {
   const q = useQuery({
     queryKey: ["collection", slug, user?.id],
     queryFn: async () => {
-      const { data } = await supabase.from("collections")
-        .select("*, author:profiles!inner(username, display_name), collection_items(position, title_id, title:titles(kind, slug, title, year, poster_path))")
+      const { data, error } = await supabase.from("collections")
+        .select("*, author:profiles!collections_user_id_fkey!inner(username, display_name), collection_items(position, title_id, title:titles(kind, slug, title, year, poster_path))")
         .eq("slug", slug).maybeSingle();
+      if (error) throw error;
       if (!data) return null;
       let saved = false;
       if (user) saved = !!(await supabase.from("saved_collections").select("collection_id").eq("user_id", user.id).eq("collection_id", data.id).maybeSingle()).data;
@@ -49,15 +50,16 @@ function CollectionPage() {
     },
   });
   if (q.isLoading) return <Page narrow><FeedSkeleton /></Page>;
+  if (q.isError) return <Page narrow><Empty title="Couldn't load collection">Please try again.</Empty></Page>;
   if (!q.data) return <Page narrow><Empty title="Collection not found" /></Page>;
   const { c, items, saved } = q.data;
   const mine = user?.id === c.user_id;
 
   const toggleSave = async () => {
-    if (!requireAuth("Sign in to save collections")) return;
+    if (!requireAuth("Sign in to save collections") || !user) return;
     const r = saved
-      ? await supabase.from("saved_collections").delete().match({ user_id: user!.id, collection_id: c.id })
-      : await supabase.from("saved_collections").insert({ user_id: user!.id, collection_id: c.id });
+      ? await supabase.from("saved_collections").delete().match({ user_id: user.id, collection_id: c.id })
+      : await supabase.from("saved_collections").insert({ user_id: user.id, collection_id: c.id });
     if (r.error) toast.error("Couldn't update."); else q.refetch();
   };
   const move = async (i: number, d: -1 | 1) => {
