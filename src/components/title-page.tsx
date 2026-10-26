@@ -36,25 +36,44 @@ export function TitlePage({ t, tab }: { t: TitleDetail; tab: TabKey }) {
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6">
-      <header className="flex gap-4 sm:gap-6">
-        <Poster path={t.posterPath} title={t.title} size="w342" className="w-28 shrink-0 sm:w-40" />
-        <div className="min-w-0">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">{t.kind === "movie" ? "Movie" : "Series"}{t.year ? ` · ${t.year}` : ""}</p>
-          <h1 className="mt-1 font-display text-3xl leading-tight sm:text-4xl">{t.title}</h1>
-          {t.genres.length > 0 && <p className="mt-1 text-sm text-muted-foreground">{t.genres.join(" · ")}</p>}
-          <p className="mt-3 line-clamp-4 text-[15px] leading-relaxed text-foreground/85 sm:line-clamp-none">{t.overview}</p>
-          <div className="mt-4 hidden sm:block"><TitleActions titleId={t.id} /></div>
+    <div>
+      {t.backdropPath && (
+        <div className="relative mx-auto max-w-5xl">
+          <div className="relative aspect-[16/10] w-full overflow-hidden sm:aspect-[21/9]">
+            <img src={`https://image.tmdb.org/t/p/w1280${t.backdropPath}`} alt="" className="h-full w-full object-cover object-top" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-background/40 via-transparent to-background/40" />
+          </div>
         </div>
+      )}
+    <div className={cn("mx-auto max-w-3xl px-4 pb-6", t.backdropPath ? "relative -mt-20 sm:-mt-28" : "pt-6")}>
+      <header className="flex items-start gap-4 sm:gap-6">
+        <div className="min-w-0 flex-1 pt-2">
+          <h1 className="font-display text-3xl leading-tight drop-shadow-sm sm:text-5xl">{t.title}</h1>
+          <p className="mt-3 text-xs uppercase tracking-widest text-muted-foreground">
+            {t.kind === "movie" ? "Movie" : "Series"}{t.year ? ` · ${t.year}` : ""}{t.creators.length > 0 ? ` · ${t.kind === "movie" ? "Directed by" : "Created by"}` : ""}
+          </p>
+          {t.creators.length > 0 && <p className="mt-1 font-medium">{t.creators.slice(0, 2).join(", ")}</p>}
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+            {t.trailerKey && (
+              <button onClick={() => setShowTrailer((v) => !v)} className="inline-flex items-center gap-1.5 rounded-md bg-secondary px-3 py-1.5 text-xs font-medium uppercase tracking-widest text-secondary-foreground hover:bg-accent">
+                <Play className="size-3.5 fill-current" /> {showTrailer ? "Hide" : "Trailer"}
+              </button>
+            )}
+            {t.runtime && <span className="text-muted-foreground">{t.runtime} mins</span>}
+            {t.seasons && <span className="text-muted-foreground">{t.seasons} season{t.seasons > 1 ? "s" : ""}</span>}
+          </div>
+          {t.genres.length > 0 && <p className="mt-3 text-sm text-muted-foreground">{t.genres.join(" · ")}</p>}
+        </div>
+        <Poster path={t.posterPath} title={t.title} size="w342" className="w-28 shrink-0 shadow-lg ring-1 ring-border sm:w-44" />
       </header>
-      <div className="mt-4 sm:hidden"><TitleActions titleId={t.id} /></div>
+
+      <p className={cn("mt-6 font-display text-lg leading-relaxed text-foreground/85", !about && "line-clamp-4")}>{t.overview}</p>
+      <div className="mt-4"><TitleActions titleId={t.id} /></div>
 
       <div className="mt-5 flex flex-wrap gap-4 text-sm">
-        {t.trailerKey && (
-          <button onClick={() => setShowTrailer((v) => !v)} className="inline-flex items-center gap-1.5 font-medium text-ember"><Play className="size-4" /> {showTrailer ? "Hide trailer" : "Watch trailer"}</button>
-        )}
         <button onClick={() => setAbout((v) => !v)} className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground" aria-expanded={about}>
-          About <ChevronDown className={cn("size-4 transition-transform", about && "rotate-180")} />
+          {about ? "Less" : "More details"} <ChevronDown className={cn("size-4 transition-transform", about && "rotate-180")} />
         </button>
       </div>
       {showTrailer && t.trailerKey && (
