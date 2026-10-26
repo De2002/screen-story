@@ -134,5 +134,6 @@ export function TitlePage({ t, tab }: { t: TitleDetail; tab: TabKey }) {
         )}
       </section>
     </div>
+    </div>
   );
 }
