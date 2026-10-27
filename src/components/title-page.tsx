@@ -5,6 +5,7 @@ import { TABS, type TabKey } from "@/lib/titles";
 import type { TitleDetail } from "@/lib/tmdb.functions";
 import { Poster } from "./bits";
 import { TitleActions } from "./title-actions";
+import { WhereToWatch } from "./where-to-watch";
 import { cn } from "@/lib/utils";
 
 const sectionCopy: Record<string, { intro: string; tone: string }> = {
@@ -109,8 +110,9 @@ export function TitlePage({ t }: { t: TitleDetail; tab?: TabKey }) {
             <ChevronDown className={cn("size-4 transition-transform", about && "rotate-180")} />
           </button>
         </section>
-        <div className="mt-5">
+        <div className="mt-5 flex flex-wrap items-center gap-2">
           <TitleActions title={t} />
+          <WhereToWatch title={t} />
         </div>
         {showTrailer && t.trailerKey && (
           <div className="mt-5 aspect-video overflow-hidden rounded-lg bg-muted">
