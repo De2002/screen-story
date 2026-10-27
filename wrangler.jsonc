@@ -1,0 +1,14 @@
+{
+  "name": "de2002-screen-story",
+  "main": ".output/server/index.mjs",
+  "compatibility_date": "2026-10-27",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": ".output/public"
+  },
+  "vars": {
+    "SUPABASE_PUBLISHABLE_KEY": "sb_publishable_ullQb6GgYlKPzDHqAuLyrw_HRDw3_jm",
+    "SUPABASE_URL": "https://bxomugacedhpvtybtrst.supabase.co"
+  }
+}
