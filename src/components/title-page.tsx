@@ -95,55 +95,23 @@ export function TitlePage({ t }: { t: TitleDetail; tab?: TabKey }) {
             className="w-28 shrink-0 shadow-lg ring-1 ring-border sm:w-44"
           />
         </header>
-        <p
-          className={cn(
-            "mt-7 max-w-2xl font-display text-lg leading-relaxed text-foreground/85",
-            !about && "line-clamp-4",
-          )}
-        >
-          {t.overview}
-        </p>
-        <div className="mt-4">
-          <TitleActions titleId={t.id} />
+        <section className="mt-7 max-w-3xl" aria-labelledby="synopsis-heading">
+          <h2 id="synopsis-heading" className="sr-only">Synopsis</h2>
+          <p className={cn("font-display text-lg leading-relaxed text-foreground/85", !about && "line-clamp-4")}>
+            {t.overview}
+          </p>
+          <button
+            onClick={() => setAbout((v) => !v)}
+            className="mt-3 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+            aria-expanded={about}
+          >
+            {about ? "Read less" : "Read more"}
+            <ChevronDown className={cn("size-4 transition-transform", about && "rotate-180")} />
+          </button>
+        </section>
+        <div className="mt-5">
+          <TitleActions title={t} />
         </div>
-        <button
-          onClick={() => setAbout((v) => !v)}
-          className="mt-5 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-          aria-expanded={about}
-        >
-          {about ? "Less" : "More details"}
-          <ChevronDown className={cn("size-4 transition-transform", about && "rotate-180")} />
-        </button>
-        {about && (
-          <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 border-t pt-4 text-sm">
-            {t.tagline && (
-              <>
-                <dt className="text-muted-foreground">Tagline</dt>
-                <dd className="italic">{t.tagline}</dd>
-              </>
-            )}
-            {t.creators.length > 0 && (
-              <>
-                <dt className="text-muted-foreground">
-                  {t.kind === "movie" ? "Director" : "Created by"}
-                </dt>
-                <dd>{t.creators.join(", ")}</dd>
-              </>
-            )}
-            {t.cast.length > 0 && (
-              <>
-                <dt className="text-muted-foreground">Cast</dt>
-                <dd>{t.cast.map((c: { name: string }) => c.name).join(", ")}</dd>
-              </>
-            )}
-            {t.status && (
-              <>
-                <dt className="text-muted-foreground">Status</dt>
-                <dd>{t.status}</dd>
-              </>
-            )}
-          </dl>
-        )}
         {showTrailer && t.trailerKey && (
           <div className="mt-5 aspect-video overflow-hidden rounded-lg bg-muted">
             <iframe
