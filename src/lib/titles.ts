@@ -29,7 +29,7 @@ export function noun(kind: Kind) {
   return kind === "movie" ? "movie" : "series";
 }
 
-export type TabKey = "lessons" | "quotes" | "reviews" | "questions" | "moments" | "trailer";
+export type TabKey = "lessons" | "quotes" | "reviews" | "questions" | "moments" | "director" | "trailer";
 
 export const TABS: { key: TabKey; label: string; category?: "lesson" | "quote" | "moment" | "trailer_thought" }[] = [
   { key: "lessons", label: "Lessons", category: "lesson" },
@@ -37,6 +37,7 @@ export const TABS: { key: TabKey; label: string; category?: "lesson" | "quote" |
   { key: "reviews", label: "Reviews" },
   { key: "questions", label: "Questions" },
   { key: "moments", label: "Moments", category: "moment" },
+  { key: "director", label: "To the Director", category: "trailer_thought" },
   { key: "trailer", label: "Trailer", category: "trailer_thought" },
 ];
 
