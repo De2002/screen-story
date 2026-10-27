@@ -1,7 +1,7 @@
 import { notFound } from "@tanstack/react-router";
 import { z } from "zod";
 import { getTitleDetail, type TitleDetail } from "./tmdb.functions";
-import { parseSlug, posterUrl, type Kind } from "./titles";
+import { parseSlug, posterUrl, TABS, type Kind } from "./titles";
 
 export const tabSearch = z.object({
   tab: z.enum(["lessons", "quotes", "reviews", "questions", "moments", "trailer"]).catch("lessons").default("lessons"),
@@ -15,7 +15,7 @@ export async function loadTitle(kind: Kind, slug: string) {
   return t;
 }
 
-export function titleHead(t: TitleDetail | undefined) {
+export function titleHead(t: TitleDetail | undefined, section?: string) {
   if (!t) return { meta: [
     { title: "Title not found — Scruttin" },
     { name: "description", content: "This movie or series could not be found on Scruttin." },
@@ -26,18 +26,21 @@ export function titleHead(t: TitleDetail | undefined) {
     { name: "robots", content: "noindex" },
   ] };
   const name = `${t.title}${t.year ? ` (${t.year})` : ""}`;
-  const desc = `Lessons, quotes, reviews and questions about ${name} from everyday viewers on Scruttin.`;
+  const label = TABS.find((tab) => tab.key === section)?.label;
+  const desc = label
+    ? `${label} about ${name} from everyday viewers on Scruttin.`
+    : `Lessons, quotes, reviews and questions about ${name} from everyday viewers on Scruttin.`;
   const img = posterUrl(t.posterPath, "w780");
   return {
     meta: [
-      { title: `${name} — talk about it on Scruttin` },
+      { title: label ? `${label} · ${name} — Scruttin` : `${name} — talk about it on Scruttin` },
       { name: "description", content: desc },
-      { property: "og:title", content: `${name} on Scruttin` },
+      { property: "og:title", content: label ? `${label} · ${name} — Scruttin` : `${name} on Scruttin` },
       { property: "og:description", content: desc },
       { property: "og:type", content: t.kind === "movie" ? "video.movie" : "video.tv_show" },
       { name: "twitter:card", content: "summary_large_image" },
       ...(img ? [{ property: "og:image", content: img }, { name: "twitter:image", content: img }] : []),
     ],
-    links: [{ rel: "canonical", href: `/${t.kind}/${t.slug}` }],
+    links: [{ rel: "canonical", href: `/${t.kind}/${t.slug}${section ? `/${section}` : ""}` }],
   };
 }

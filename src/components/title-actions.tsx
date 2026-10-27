@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth";
 import { collectionSlug } from "@/lib/community";
 import type { TitleDetail } from "@/lib/tmdb.functions";
 import { addCollectionItem } from "@/lib/collection-items";
+import { writeLibraryStatus } from "@/lib/library-items";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -16,52 +17,46 @@ export function TitleActions({ title }: { title: TitleDetail }) {
   const { user, requireAuth } = useAuth();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const libraryBusy = useRef(false);
+  const [savingLibrary, setSavingLibrary] = useState(false);
   const status = useQuery({
     queryKey: ["library-status", titleId, user?.id],
     enabled: !!user,
     queryFn: async () => {
       if (!user) return null;
-      const { data } = await supabase.from("library").select("status").eq("user_id", user.id).eq("title_id", titleId).maybeSingle();
+      const { data, error } = await supabase.from("library").select("status").eq("user_id", user.id).eq("title_id", titleId).maybeSingle();
+      if (error) throw error;
       return (data?.status as "watched" | "want" | undefined) ?? null;
     },
   });
   const set = async (s: "watched" | "want") => {
+    if (libraryBusy.current || status.isLoading || status.isError) return;
     if (!requireAuth(s === "watched" ? "Sign in to track what you've watched" : "Sign in to build your watchlist") || !user) return;
+    libraryBusy.current = true;
+    setSavingLibrary(true);
     const current = status.data;
     qc.setQueryData(["library-status", titleId, user.id], current === s ? null : s);
-    let error = null;
-    if (current === s) {
-      ({ error } = await supabase.from("library").delete().match({ user_id: user.id, title_id: titleId }));
-    } else {
-      const titleResult = await supabase.from("titles").upsert({
-        id: title.id,
-        kind: title.kind,
-        tmdb_id: title.tmdbId,
-        slug: title.slug,
-        title: title.title,
-        year: title.year,
-        poster_path: title.posterPath,
-        genres: title.genres,
-      });
-      if (titleResult.error) {
-        error = titleResult.error;
-      } else {
-        ({ error } = await supabase.from("library").upsert(
-          { user_id: user.id, title_id: titleId, status: s },
-          { onConflict: "user_id,title_id" },
-        ));
-      }
+    try {
+      await writeLibraryStatus(user.id, titleId, current === s ? null : s);
+    } catch {
+      toast.error("Couldn't update your library.");
+      qc.setQueryData(["library-status", titleId, user.id], current);
+    } finally {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["library"] }),
+        qc.invalidateQueries({ queryKey: ["library-status", titleId, user.id] }),
+      ]);
+      libraryBusy.current = false;
+      setSavingLibrary(false);
     }
-    if (error) { toast.error("Couldn't update your library."); qc.setQueryData(["library-status", titleId, user.id], current); }
-    qc.invalidateQueries({ queryKey: ["library"] });
   };
   const s = status.data;
   return (
     <div className="flex flex-wrap gap-2">
-      <Button size="sm" variant={s === "watched" ? "default" : "outline"} onClick={() => set("watched")} aria-pressed={s === "watched"}>
+      <Button size="sm" disabled={savingLibrary || (!!user && (status.isLoading || status.isError))} variant={s === "watched" ? "default" : "outline"} onClick={() => set("watched")} aria-pressed={s === "watched"}>
         {s === "watched" ? <Check /> : <Eye />} Watched
       </Button>
-      <Button size="sm" variant={s === "want" ? "default" : "outline"} onClick={() => set("want")} aria-pressed={s === "want"}>
+      <Button size="sm" disabled={savingLibrary || (!!user && (status.isLoading || status.isError))} variant={s === "want" ? "default" : "outline"} onClick={() => set("want")} aria-pressed={s === "want"}>
         <Bookmark /> Want to watch
       </Button>
       <Button size="sm" variant="outline" onClick={() => requireAuth("Sign in to make collections") && setOpen(true)}>
