@@ -26,8 +26,8 @@ import { Route as QuestionsIdRouteImport } from './routes/questions.$id'
 import { Route as ReviewsIdRouteImport } from './routes/reviews.$id'
 import { Route as SeriesSlugRouteImport } from './routes/series.$slug'
 import { Route as UUsernameRouteImport } from './routes/u.$username'
-import { Route as MovieSlugSectionRouteImport } from './routes/movie.$slug.$section'
-import { Route as SeriesSlugSectionRouteImport } from './routes/series.$slug.$section'
+import { Route as MovieSlugSectionRouteImport } from './routes/movie.$slug_.$section'
+import { Route as SeriesSlugSectionRouteImport } from './routes/series.$slug_.$section'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -114,14 +114,14 @@ const UUsernameRoute = UUsernameRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const MovieSlugSectionRoute = MovieSlugSectionRouteImport.update({
-  id: '/$section',
-  path: '/$section',
-  getParentRoute: () => MovieSlugRoute,
+  id: '/movie/$slug_/$section',
+  path: '/movie/$slug/$section',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SeriesSlugSectionRoute = SeriesSlugSectionRouteImport.update({
-  id: '/$section',
-  path: '/$section',
-  getParentRoute: () => SeriesSlugRoute,
+  id: '/series/$slug_/$section',
+  path: '/series/$slug/$section',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -135,10 +135,10 @@ export interface FileRoutesByFullPath {
   '/library': typeof AuthenticatedLibraryRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/collections/$slug': typeof CollectionsSlugRoute
-  '/movie/$slug': typeof MovieSlugRouteWithChildren
+  '/movie/$slug': typeof MovieSlugRoute
   '/questions/$id': typeof QuestionsIdRoute
   '/reviews/$id': typeof ReviewsIdRoute
-  '/series/$slug': typeof SeriesSlugRouteWithChildren
+  '/series/$slug': typeof SeriesSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/collections/': typeof CollectionsIndexRoute
   '/movie/$slug/$section': typeof MovieSlugSectionRoute
@@ -155,10 +155,10 @@ export interface FileRoutesByTo {
   '/library': typeof AuthenticatedLibraryRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/collections/$slug': typeof CollectionsSlugRoute
-  '/movie/$slug': typeof MovieSlugRouteWithChildren
+  '/movie/$slug': typeof MovieSlugRoute
   '/questions/$id': typeof QuestionsIdRoute
   '/reviews/$id': typeof ReviewsIdRoute
-  '/series/$slug': typeof SeriesSlugRouteWithChildren
+  '/series/$slug': typeof SeriesSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/collections': typeof CollectionsIndexRoute
   '/movie/$slug/$section': typeof MovieSlugSectionRoute
@@ -177,14 +177,14 @@ export interface FileRoutesById {
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/collections/$slug': typeof CollectionsSlugRoute
-  '/movie/$slug': typeof MovieSlugRouteWithChildren
+  '/movie/$slug': typeof MovieSlugRoute
   '/questions/$id': typeof QuestionsIdRoute
   '/reviews/$id': typeof ReviewsIdRoute
-  '/series/$slug': typeof SeriesSlugRouteWithChildren
+  '/series/$slug': typeof SeriesSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/collections/': typeof CollectionsIndexRoute
-  '/movie/$slug/$section': typeof MovieSlugSectionRoute
-  '/series/$slug/$section': typeof SeriesSlugSectionRoute
+  '/movie/$slug_/$section': typeof MovieSlugSectionRoute
+  '/series/$slug_/$section': typeof SeriesSlugSectionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -246,8 +246,8 @@ export interface FileRouteTypes {
     | '/series/$slug'
     | '/u/$username'
     | '/collections/'
-    | '/movie/$slug/$section'
-    | '/series/$slug/$section'
+    | '/movie/$slug_/$section'
+    | '/series/$slug_/$section'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -259,12 +259,14 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
   CollectionsSlugRoute: typeof CollectionsSlugRoute
-  MovieSlugRoute: typeof MovieSlugRouteWithChildren
+  MovieSlugRoute: typeof MovieSlugRoute
   QuestionsIdRoute: typeof QuestionsIdRoute
   ReviewsIdRoute: typeof ReviewsIdRoute
-  SeriesSlugRoute: typeof SeriesSlugRouteWithChildren
+  SeriesSlugRoute: typeof SeriesSlugRoute
   UUsernameRoute: typeof UUsernameRoute
   CollectionsIndexRoute: typeof CollectionsIndexRoute
+  MovieSlugSectionRoute: typeof MovieSlugSectionRoute
+  SeriesSlugSectionRoute: typeof SeriesSlugSectionRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -388,19 +390,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/movie/$slug/$section': {
-      id: '/movie/$slug/$section'
-      path: '/$section'
+    '/movie/$slug_/$section': {
+      id: '/movie/$slug_/$section'
+      path: '/movie/$slug/$section'
       fullPath: '/movie/$slug/$section'
       preLoaderRoute: typeof MovieSlugSectionRouteImport
-      parentRoute: typeof MovieSlugRoute
+      parentRoute: typeof rootRouteImport
     }
-    '/series/$slug/$section': {
-      id: '/series/$slug/$section'
-      path: '/$section'
+    '/series/$slug_/$section': {
+      id: '/series/$slug_/$section'
+      path: '/series/$slug/$section'
       fullPath: '/series/$slug/$section'
       preLoaderRoute: typeof SeriesSlugSectionRouteImport
-      parentRoute: typeof SeriesSlugRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -420,30 +422,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface MovieSlugRouteChildren {
-  MovieSlugSectionRoute: typeof MovieSlugSectionRoute
-}
-
-const MovieSlugRouteChildren: MovieSlugRouteChildren = {
-  MovieSlugSectionRoute: MovieSlugSectionRoute,
-}
-
-const MovieSlugRouteWithChildren = MovieSlugRoute._addFileChildren(
-  MovieSlugRouteChildren,
-)
-
-interface SeriesSlugRouteChildren {
-  SeriesSlugSectionRoute: typeof SeriesSlugSectionRoute
-}
-
-const SeriesSlugRouteChildren: SeriesSlugRouteChildren = {
-  SeriesSlugSectionRoute: SeriesSlugSectionRoute,
-}
-
-const SeriesSlugRouteWithChildren = SeriesSlugRoute._addFileChildren(
-  SeriesSlugRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -453,12 +431,14 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
   CollectionsSlugRoute: CollectionsSlugRoute,
-  MovieSlugRoute: MovieSlugRouteWithChildren,
+  MovieSlugRoute: MovieSlugRoute,
   QuestionsIdRoute: QuestionsIdRoute,
   ReviewsIdRoute: ReviewsIdRoute,
-  SeriesSlugRoute: SeriesSlugRouteWithChildren,
+  SeriesSlugRoute: SeriesSlugRoute,
   UUsernameRoute: UUsernameRoute,
   CollectionsIndexRoute: CollectionsIndexRoute,
+  MovieSlugSectionRoute: MovieSlugSectionRoute,
+  SeriesSlugSectionRoute: SeriesSlugSectionRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
