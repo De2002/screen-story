@@ -86,14 +86,36 @@ export function SectionPage({ t, section }: { t: TitleDetail; section: string })
   };
   const kindPath = t.kind === "movie" ? "/movie/$slug" : "/series/$slug";
 
+  const hasBackdrop = Boolean(t.backdropPath);
+  const backdropUrl = hasBackdrop ? `https://image.tmdb.org/t/p/w1280${t.backdropPath}` : undefined;
+
   return (
     <main className="min-h-screen">
-      <div className={`border-b ${details.tone}`}>
-        <div className="mx-auto max-w-5xl px-4 py-8 sm:py-12">
+      <div
+        className={`relative overflow-hidden border-b ${hasBackdrop ? "bg-slate-950 text-white" : details.tone}`}
+      >
+        {backdropUrl && (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${backdropUrl})` }}
+          />
+        )}
+        {hasBackdrop && (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-[linear-gradient(90deg,rgba(3,7,18,0.94)_0%,rgba(3,7,18,0.78)_45%,rgba(3,7,18,0.58)_100%)]"
+          />
+        )}
+        <div className="relative mx-auto max-w-5xl px-4 py-8 sm:py-12">
           <Link
             to={kindPath}
             params={{ slug: t.slug }}
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+            className={
+              hasBackdrop
+                ? "inline-flex items-center gap-2 text-sm text-white/75 hover:text-white"
+                : "inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+            }
           >
             <ArrowLeft className="size-4" /> Back to {t.title}
           </Link>
@@ -111,13 +133,23 @@ export function SectionPage({ t, section }: { t: TitleDetail; section: string })
               <h1 className="mt-2 font-display text-4xl leading-tight sm:text-6xl">
                 {details.label}
               </h1>
-              <p className="mt-2 text-sm text-foreground/65">
+              <p
+                className={
+                  hasBackdrop ? "mt-2 text-sm text-white/75" : "mt-2 text-sm text-foreground/65"
+                }
+              >
                 {t.title}
                 {t.year ? ` · ${t.year}` : ""}
               </p>
             </div>
           </div>
-          <p className="mt-7 max-w-2xl font-display text-xl leading-relaxed text-foreground/80">
+          <p
+            className={
+              hasBackdrop
+                ? "mt-7 max-w-2xl font-display text-xl leading-relaxed text-white/90"
+                : "mt-7 max-w-2xl font-display text-xl leading-relaxed text-foreground/80"
+            }
+          >
             {details.intro}
           </p>
           <div className="mt-4">
