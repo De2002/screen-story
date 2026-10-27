@@ -15,3 +15,5 @@
 - Community writes go straight from the browser with RLS; counters, removal and status changes are guarded by DB triggers. Why: server-side authorization without extra endpoints.
 - Collection additions use an idempotent item writer and serialize dialog mutations until refetch completes. Why: repeated clicks must not conflict or report unsaved additions as successful.
 - The first account to sign up becomes admin (DB trigger). Why: bootstraps moderation.
+- Library mutations only write member-owned library rows, never catalog titles, and serialize until refetch completes. Why: titles are server-cached and browser writes are intentionally blocked.
+- Standalone title conversation routes use an un-nested slug segment. Why: the full title page has no Outlet and otherwise hides section pages.

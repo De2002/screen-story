@@ -65,15 +65,17 @@ export function SectionPage({ t, section }: { t: TitleDetail; section: string })
   const myReview = useQuery({
     queryKey: ["my-review", t.id, user?.id],
     enabled: !!user && section === "reviews",
-    queryFn: async () =>
-      (
+    queryFn: async () => {
+      if (!user) return null;
+      return (
         await supabase
           .from("reviews")
           .select("id, heading, body, spoiler")
           .eq("title_id", t.id)
-          .eq("user_id", user!.id)
+          .eq("user_id", user.id)
           .maybeSingle()
-      ).data,
+      ).data;
+    },
   });
   const refresh = () => {
     if (details.category)
@@ -119,7 +121,7 @@ export function SectionPage({ t, section }: { t: TitleDetail; section: string })
             {details.intro}
           </p>
           <div className="mt-4">
-            <TitleActions titleId={t.id} />
+            <TitleActions title={t} />
           </div>
         </div>
       </div>
@@ -128,7 +130,7 @@ export function SectionPage({ t, section }: { t: TitleDetail; section: string })
           {Object.entries(copy).map(([key, item]) => (
             <Link
               key={key}
-              to={t.kind === "movie" ? "/movie/$slug/$section" : "/series/$slug/$section"}
+              to={t.kind === "movie" ? "/movie/$slug_/$section" : "/series/$slug_/$section"}
               params={{ slug: t.slug, section: key }}
               className={`whitespace-nowrap rounded-full px-3 py-1.5 ${key === section ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted"}`}
             >

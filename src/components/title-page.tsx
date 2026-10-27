@@ -136,7 +136,7 @@ export function TitlePage({ t }: { t: TitleDetail; tab?: TabKey }) {
           <div className="grid gap-3 sm:grid-cols-2">
             {sections.map((section) => {
               const copy = sectionCopy[section.key];
-              const path = t.kind === "movie" ? "/movie/$slug/$section" : "/series/$slug/$section";
+              const path = t.kind === "movie" ? "/movie/$slug_/$section" : "/series/$slug_/$section";
               return (
                 <Link
                   key={section.key}

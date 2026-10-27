@@ -2,9 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SectionPage } from "@/components/section-page";
 import { loadTitle, titleHead } from "@/lib/title-route";
 
-export const Route = createFileRoute("/series/$slug/$section")({
+export const Route = createFileRoute("/series/$slug_/$section")({
   loader: ({ params }) => loadTitle("series", params.slug),
-  head: ({ loaderData }) => titleHead(loaderData),
+  head: ({ loaderData, params }) => titleHead(loaderData, params.section),
   component: SeriesSectionPage,
 });
 
