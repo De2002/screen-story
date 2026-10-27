@@ -179,6 +179,42 @@ export const getTitleDetail = createServerFn({ method: "GET" })
 
 export type TitleDetail = NonNullable<Awaited<ReturnType<typeof getTitleDetail>>>;
 
+export type WatchProvider = {
+  name: string;
+  logoPath: string | null;
+  link: string | null;
+};
+
+export const getWatchProviders = createServerFn({ method: "GET" })
+  .inputValidator((d) => z.object({ kind: z.enum(["movie", "series"]), tmdbId: z.number().int().positive() }).parse(d))
+  .handler(async ({ data }) => {
+    try {
+      const path = data.kind === "movie" ? `/movie/${data.tmdbId}/watch/providers` : `/tv/${data.tmdbId}/watch/providers`;
+      const r = await tmdb(path);
+      const us = r.results?.US ?? r.results?.GB ?? Object.values(r.results ?? {})[0] ?? {};
+      const providers = [
+        ...(us.flatrate ?? []),
+        ...(us.free ?? []),
+        ...(us.ads ?? []),
+        ...(us.rent ?? []),
+        ...(us.buy ?? []),
+      ];
+      const seen = new Set<string>();
+      return {
+        region: r.results?.US ? "US" : r.results?.GB ? "GB" : null,
+        link: us.link ?? null,
+        providers: providers.filter((p: any) => {
+          if (seen.has(p.provider_id)) return false;
+          seen.add(p.provider_id);
+          return true;
+        }).map((p: any) => ({ name: p.provider_name, logoPath: p.logo_path ?? null, link: us.link ?? null })) as WatchProvider[],
+      };
+    } catch (e) {
+      console.error(e);
+      return { region: null, link: null, providers: [] as WatchProvider[] };
+    }
+  });
+
 export const ensureTitles = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ items: z.array(z.object({ kind: z.enum(["movie", "series"]), tmdbId: z.number().int() })).max(5) }).parse(d))
   .handler(async ({ data }) => {
