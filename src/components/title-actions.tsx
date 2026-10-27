@@ -8,6 +8,18 @@ import { collectionSlug } from "@/lib/community";
 import type { TitleDetail } from "@/lib/tmdb.functions";
 import { addCollectionItem } from "@/lib/collection-items";
 import { writeLibraryStatus } from "@/lib/library-items";
+import { ensureTitles } from "@/lib/tmdb.functions";
+
+/** If the title isn't cached yet (missing-reference error), cache it once and retry. */
+async function withTitle<T>(title: TitleDetail, write: () => Promise<T>): Promise<T> {
+  try {
+    return await write();
+  } catch (e: any) {
+    if (e?.code !== "23503") throw e;
+    await ensureTitles({ data: { items: [{ kind: title.kind, tmdbId: title.tmdbId }] } });
+    return await write();
+  }
+}
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -37,7 +49,7 @@ export function TitleActions({ title }: { title: TitleDetail }) {
     const current = status.data;
     qc.setQueryData(["library-status", titleId, user.id], current === s ? null : s);
     try {
-      await writeLibraryStatus(user.id, titleId, current === s ? null : s);
+      await withTitle(title, () => writeLibraryStatus(user.id, titleId, current === s ? null : s));
     } catch {
       toast.error("Couldn't update your library.");
       qc.setQueryData(["library-status", titleId, user.id], current);
@@ -62,12 +74,13 @@ export function TitleActions({ title }: { title: TitleDetail }) {
       <Button size="sm" variant="outline" onClick={() => requireAuth("Sign in to make collections") && setOpen(true)}>
         <Plus /> Add to collection
       </Button>
-      {user && <AddToCollection open={open} onOpenChange={setOpen} titleId={titleId} />}
+      {user && <AddToCollection open={open} onOpenChange={setOpen} title={title} />}
     </div>
   );
 }
 
-function AddToCollection({ open, onOpenChange, titleId }: { open: boolean; onOpenChange: (o: boolean) => void; titleId: string }) {
+function AddToCollection({ open, onOpenChange, title }: { open: boolean; onOpenChange: (o: boolean) => void; title: TitleDetail }) {
+  const titleId = title.id;
   const { user } = useAuth();
   const [name, setName] = useState("");
   const [pending, setPending] = useState(false);
@@ -99,7 +112,7 @@ function AddToCollection({ open, onOpenChange, titleId }: { open: boolean; onOpe
         const { error } = await supabase.from("collection_items").delete().match({ collection_id: c.id, title_id: titleId });
         if (error) throw error;
       } else {
-        await addCollectionItem(c.id, titleId, c.count);
+        await withTitle(title, () => addCollectionItem(c.id, titleId, c.count));
       }
       const { error } = await supabase.from("collections").update({ updated_at: new Date().toISOString() }).eq("id", c.id);
       if (error) throw error;
@@ -121,7 +134,7 @@ function AddToCollection({ open, onOpenChange, titleId }: { open: boolean; onOpe
       if (error || !data) throw error ?? new Error("Collection not created");
       created = true;
       setName("");
-      await addCollectionItem(data.id, titleId, 0);
+      await withTitle(title, () => addCollectionItem(data.id, titleId, 0));
       toast.success("Added to your new collection");
     } catch {
       toast.error(created ? "Collection created, but the title wasn't added. Please try adding it again." : "Couldn't create collection. Please try again.");
