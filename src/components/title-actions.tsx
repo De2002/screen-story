@@ -5,12 +5,14 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { collectionSlug } from "@/lib/community";
+import type { TitleDetail } from "@/lib/tmdb.functions";
 import { addCollectionItem } from "@/lib/collection-items";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
-export function TitleActions({ titleId }: { titleId: string }) {
+export function TitleActions({ title }: { title: TitleDetail }) {
+  const titleId = title.id;
   const { user, requireAuth } = useAuth();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -27,10 +29,30 @@ export function TitleActions({ titleId }: { titleId: string }) {
     if (!requireAuth(s === "watched" ? "Sign in to track what you've watched" : "Sign in to build your watchlist") || !user) return;
     const current = status.data;
     qc.setQueryData(["library-status", titleId, user.id], current === s ? null : s);
-    const res = current === s
-      ? await supabase.from("library").delete().match({ user_id: user.id, title_id: titleId })
-      : await supabase.from("library").upsert({ user_id: user.id, title_id: titleId, status: s });
-    if (res.error) { toast.error("Couldn't update your library."); qc.setQueryData(["library-status", titleId, user.id], current); }
+    let error = null;
+    if (current === s) {
+      ({ error } = await supabase.from("library").delete().match({ user_id: user.id, title_id: titleId }));
+    } else {
+      const titleResult = await supabase.from("titles").upsert({
+        id: title.id,
+        kind: title.kind,
+        tmdb_id: title.tmdbId,
+        slug: title.slug,
+        title: title.title,
+        year: title.year,
+        poster_path: title.posterPath,
+        genres: title.genres,
+      });
+      if (titleResult.error) {
+        error = titleResult.error;
+      } else {
+        ({ error } = await supabase.from("library").upsert(
+          { user_id: user.id, title_id: titleId, status: s },
+          { onConflict: "user_id,title_id" },
+        ));
+      }
+    }
+    if (error) { toast.error("Couldn't update your library."); qc.setQueryData(["library-status", titleId, user.id], current); }
     qc.invalidateQueries({ queryKey: ["library"] });
   };
   const s = status.data;
