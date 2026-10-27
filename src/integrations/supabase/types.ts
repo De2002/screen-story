@@ -635,6 +635,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cache_title: {
+        Args: {
+          _genres: string[]
+          _id: string
+          _kind: string
+          _poster_path: string
+          _slug: string
+          _title: string
+          _tmdb_id: number
+          _year: number
+        }
+        Returns: undefined
+      }
       can_write: { Args: { _user_id: string }; Returns: boolean }
       has_role: {
         Args: {

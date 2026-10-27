@@ -8,6 +8,13 @@
       "when": 1792573771075,
       "tag": "0000_scruttin_core",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793099889272,
+      "tag": "0001_cache_title_rpc",
+      "breakpoints": true
     }
   ]
 }
