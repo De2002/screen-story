@@ -130,7 +130,7 @@ export function SectionPage({ t, section }: { t: TitleDetail; section: string })
           {Object.entries(copy).map(([key, item]) => (
             <Link
               key={key}
-              to={t.kind === "movie" ? "/movie/$slug_/$section" : "/series/$slug_/$section"}
+              to={t.kind === "movie" ? "/movie/$slug/$section" : "/series/$slug/$section"}
               params={{ slug: t.slug, section: key }}
               className={`whitespace-nowrap rounded-full px-3 py-1.5 ${key === section ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted"}`}
             >
