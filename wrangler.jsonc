@@ -1,5 +1,5 @@
 {
-  "name": "de2002-screen-story",
+  "name": "screen-story",
   "main": ".output/server/index.mjs",
   "compatibility_date": "2026-10-27",
   "compatibility_flags": ["nodejs_compat"],
