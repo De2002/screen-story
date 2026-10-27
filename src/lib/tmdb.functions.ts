@@ -166,10 +166,10 @@ export const getTitleDetail = createServerFn({ method: "GET" })
     };
     // cache into titles table for community joins
     try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await supabaseAdmin.from("titles").upsert({
+      const { cacheTitle } = await import("./title-cache.server");
+      await cacheTitle({
         id: s.id, kind: s.kind, tmdb_id: s.tmdbId, slug: s.slug, title: s.title, year: s.year,
-        poster_path: s.posterPath, genres: detail.genres, updated_at: new Date().toISOString(),
+        poster_path: s.posterPath, genres: detail.genres,
       });
     } catch (e) {
       console.error("title cache failed", e);
@@ -182,14 +182,14 @@ export type TitleDetail = NonNullable<Awaited<ReturnType<typeof getTitleDetail>>
 export const ensureTitles = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ items: z.array(z.object({ kind: z.enum(["movie", "series"]), tmdbId: z.number().int() })).max(5) }).parse(d))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { cacheTitle } = await import("./title-cache.server");
     for (const it of data.items) {
       const r = await tmdb(it.kind === "movie" ? `/movie/${it.tmdbId}` : `/tv/${it.tmdbId}`).catch(() => null);
       if (!r) continue;
       const s = toSummary(r, it.kind)!;
-      await supabaseAdmin.from("titles").upsert({
+      await cacheTitle({
         id: s.id, kind: s.kind, tmdb_id: s.tmdbId, slug: s.slug, title: s.title, year: s.year,
-        poster_path: s.posterPath, genres: (r.genres ?? []).map((g: any) => g.name), updated_at: new Date().toISOString(),
+        poster_path: s.posterPath, genres: (r.genres ?? []).map((g: any) => g.name),
       });
     }
     return { ok: true };
