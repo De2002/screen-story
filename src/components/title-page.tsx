@@ -25,27 +25,27 @@ import { cn } from "@/lib/utils";
 const sectionCopy: Record<string, { intro: string; tone: string }> = {
   lessons: {
     intro: "What this story leaves us thinking about life, people, and society.",
-    tone: "bg-amber-50/70",
+    tone: "border-amber-800/40 bg-amber-950/35 hover:bg-amber-950/50",
   },
   quotes: {
     intro: "The lines that stayed with us long after the credits rolled.",
-    tone: "bg-sky-50/70",
+    tone: "border-sky-800/40 bg-sky-950/35 hover:bg-sky-950/50",
   },
   reviews: {
     intro: "Personal responses and critical takes from people who watched it.",
-    tone: "bg-rose-50/70",
+    tone: "border-rose-800/40 bg-rose-950/35 hover:bg-rose-950/50",
   },
   questions: {
     intro: "The things this story makes us curious enough to ask out loud.",
-    tone: "bg-violet-50/70",
+    tone: "border-violet-800/40 bg-violet-950/35 hover:bg-violet-950/50",
   },
   moments: {
     intro: "Scenes, events, and turning points that changed the way we saw the story.",
-    tone: "bg-emerald-50/70",
+    tone: "border-emerald-800/40 bg-emerald-950/35 hover:bg-emerald-950/50",
   },
   director: {
     intro: "Messages, observations, and questions addressed to the filmmaker.",
-    tone: "bg-orange-50/70",
+    tone: "border-orange-800/40 bg-orange-950/35 hover:bg-orange-950/50",
   },
 };
 

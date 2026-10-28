@@ -77,7 +77,7 @@ export function TitleActions({ title }: { title: TitleDetail }) {
   };
   const s = status.data;
   return (
-    <div className="pointer-events-none fixed right-3 top-1/2 z-20 flex -translate-y-1/2 flex-col gap-2 sm:pointer-events-auto sm:static sm:translate-y-0 sm:flex-row sm:flex-wrap">
+    <div className="pointer-events-none fixed bottom-20 right-3 z-20 flex flex-col gap-2 sm:pointer-events-auto sm:static sm:flex-row sm:flex-wrap">
       <Button
         className="pointer-events-auto rounded-full shadow-md sm:rounded-md sm:shadow-none"
         size="sm"

@@ -24,35 +24,35 @@ const copy: Record<
     label: "Lessons",
     intro: "This is where viewers share what the story taught them about life, people, or society.",
     category: "lesson",
-    tone: "bg-amber-50/70",
+    tone: "border-amber-800/40 bg-amber-950/35 hover:bg-amber-950/50",
   },
   quotes: {
     label: "Quotes",
     intro: "This is where memorable dialogue finds a second life through the people who heard it.",
     category: "quote",
-    tone: "bg-sky-50/70",
+    tone: "border-sky-800/40 bg-sky-950/35 hover:bg-sky-950/50",
   },
   reviews: {
     label: "Reviews",
     intro: "This is where personal opinions and critical assessments meet in conversation.",
-    tone: "bg-rose-50/70",
+    tone: "border-rose-800/40 bg-rose-950/35 hover:bg-rose-950/50",
   },
   questions: {
     label: "Questions",
     intro: "This is where viewers bring the questions they want to explore or discuss.",
-    tone: "bg-violet-50/70",
+    tone: "border-violet-800/40 bg-violet-950/35 hover:bg-violet-950/50",
   },
   moments: {
     label: "Moments",
     intro: "This is where memorable scenes, events, and turning points are collected.",
     category: "moment",
-    tone: "bg-emerald-50/70",
+    tone: "border-emerald-800/40 bg-emerald-950/35 hover:bg-emerald-950/50",
   },
   director: {
     label: "To the Director",
     intro: "This is where viewers leave messages, observations, or questions for the filmmaker.",
     category: "trailer_thought",
-    tone: "bg-orange-50/70",
+    tone: "border-orange-800/40 bg-orange-950/35 hover:bg-orange-950/50",
   },
 };
 
