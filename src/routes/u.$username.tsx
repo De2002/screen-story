@@ -38,7 +38,13 @@ function Profile() {
   if (!p) return <Page narrow><Empty title="No one here by that name" /></Page>;
   return (
     <Page narrow>
-      <div className="flex items-center gap-4">
+      {p.backdrop_path && (
+        <div className="relative -mx-4 -mt-6 mb-[-3rem] h-56 overflow-hidden sm:-mx-8 sm:h-72 sm:rounded-b-xl">
+          <img src={`https://image.tmdb.org/t/p/w1280${p.backdrop_path}`} alt="" aria-hidden="true" className="absolute inset-0 size-full object-cover" />
+          <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-transparent via-background/30 to-background" />
+        </div>
+      )}
+      <div className="relative flex items-center gap-4">
         <UserAvatar author={p} size={64} />
         <div>
           <h1 className="font-display text-3xl">{p.display_name || p.username}</h1>
