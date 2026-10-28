@@ -32,6 +32,10 @@ function Settings() {
     if (profile) setF({ username: profile.username, display_name: profile.display_name, bio: profile.bio, avatar_url: profile.avatar_url ?? "" });
   }, [profile]);
   const [uploading, setUploading] = useState(false);
+  const [backdrop, setBackdrop] = useState<string | null>(null);
+  useEffect(() => {
+    setBackdrop(((profile as { backdrop_path?: string | null } | null)?.backdrop_path) ?? null);
+  }, [profile]);
   const upload = async (file: File) => {
     if (!profile) return;
     if (!file.type.startsWith("image/")) return toast.error("Please choose an image.");
