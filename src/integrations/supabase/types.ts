@@ -320,6 +320,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          backdrop_path: string | null
           bio: string
           created_at: string
           display_name: string
@@ -329,6 +330,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          backdrop_path?: string | null
           bio?: string
           created_at?: string
           display_name?: string
@@ -338,6 +340,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          backdrop_path?: string | null
           bio?: string
           created_at?: string
           display_name?: string

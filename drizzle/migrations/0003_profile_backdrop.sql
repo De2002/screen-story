@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS backdrop_path text CHECK (backdrop_path IS NULL OR backdrop_path ~ '^/[A-Za-z0-9_\-]+\.(jpg|jpeg|png|webp)$');
