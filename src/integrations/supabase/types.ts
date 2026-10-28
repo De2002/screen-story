@@ -317,6 +317,39 @@ export type Database = {
           },
         ]
       }
+      profile_favourites: {
+        Row: {
+          slot: number
+          title_id: string
+          user_id: string
+        }
+        Insert: {
+          slot: number
+          title_id: string
+          user_id: string
+        }
+        Update: {
+          slot?: number
+          title_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_favourites_title_id_fkey"
+            columns: ["title_id"]
+            isOneToOne: false
+            referencedRelation: "titles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_favourites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

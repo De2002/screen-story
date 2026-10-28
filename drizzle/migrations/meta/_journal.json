@@ -29,6 +29,13 @@
       "when": 1793147628103,
       "tag": "0003_profile_backdrop",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793148393182,
+      "tag": "0004_profile_favourite_four",
+      "breakpoints": true
     }
   ]
 }
