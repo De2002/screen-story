@@ -22,6 +22,13 @@
       "when": 1793147233137,
       "tag": "0002_avatar_storage_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793147628103,
+      "tag": "0003_profile_backdrop",
+      "breakpoints": true
     }
   ]
 }
