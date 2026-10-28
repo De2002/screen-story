@@ -86,8 +86,12 @@ export function SectionPage({ t, section }: { t: TitleDetail; section: string })
   };
   const kindPath = t.kind === "movie" ? "/movie/$slug" : "/series/$slug";
 
-  const hasBackdrop = Boolean(t.backdropPath);
-  const backdropUrl = hasBackdrop ? `https://image.tmdb.org/t/p/w1280${t.backdropPath}` : undefined;
+  // Each section gets its own backdrop; index 0 is the main title-page backdrop.
+  const pool = t.backdrops?.length ? t.backdrops : t.backdropPath ? [t.backdropPath] : [];
+  const sectionIndex = Math.max(0, Object.keys(copy).indexOf(section));
+  const chosen = pool.length > 1 ? pool[1 + (sectionIndex % (pool.length - 1))] : pool[0];
+  const hasBackdrop = Boolean(chosen);
+  const backdropUrl = hasBackdrop ? `https://image.tmdb.org/t/p/w1280${chosen}` : undefined;
 
   return (
     <main className="min-h-screen">

@@ -138,7 +138,7 @@ export const getTitleDetail = createServerFn({ method: "GET" })
     const path = data.kind === "movie" ? `/movie/${data.tmdbId}` : `/tv/${data.tmdbId}`;
     let r: any;
     try {
-      r = await tmdb(path, { append_to_response: "credits,videos" });
+      r = await tmdb(path, { append_to_response: "credits,videos,images", include_image_language: "en,null" });
     } catch {
       return null;
     }
@@ -158,6 +158,12 @@ export const getTitleDetail = createServerFn({ method: "GET" })
       seasons: r.number_of_seasons ?? null,
       episodes: r.number_of_episodes ?? null,
       backdropPath: r.backdrop_path ?? null,
+      backdrops: Array.from(
+        new Set<string>([
+          ...(r.backdrop_path ? [r.backdrop_path as string] : []),
+          ...((r.images?.backdrops ?? []) as any[]).map((b) => b.file_path as string).filter(Boolean),
+        ]),
+      ).slice(0, 12),
       trailerKey: trailer?.key ?? null,
       creators: creators as string[],
       cast: (r.credits?.cast ?? []).slice(0, 8).map((c: any) => ({ name: c.name as string, character: c.character as string })),
