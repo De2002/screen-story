@@ -15,6 +15,13 @@
       "when": 1793099889272,
       "tag": "0001_cache_title_rpc",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793147233137,
+      "tag": "0002_avatar_storage_policies",
+      "breakpoints": true
     }
   ]
 }
