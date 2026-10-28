@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { BackdropPicker } from "@/components/backdrop-picker";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -82,6 +83,21 @@ function Settings() {
             <Input id="a" type="file" accept="image/*" disabled={uploading} onChange={(e) => { const file = e.target.files?.[0]; if (file) upload(file); e.target.value = ""; }} />
           </div>
           {uploading && <p className="text-xs text-muted-foreground">Uploading…</p>}
+        </div>
+        <div className="space-y-1.5">
+          <Label>Profile backdrop</Label>
+          <p className="text-xs text-muted-foreground">Pick a favourite scene to show across the top of your profile.</p>
+          <BackdropPicker
+            value={backdrop}
+            onPick={async (path) => {
+              if (!profile) return;
+              const { error } = await supabase.from("profiles").update({ backdrop_path: path }).eq("id", profile.id);
+              if (error) return toast.error("Couldn't save backdrop.");
+              setBackdrop(path);
+              toast.success(path ? "Backdrop updated" : "Backdrop removed");
+              refreshProfile();
+            }}
+          />
         </div>
         <div className="space-y-1.5"><Label htmlFor="b">About you</Label><Textarea id="b" value={f.bio} maxLength={300} onChange={(e) => setF({ ...f, bio: e.target.value })} /></div>
         <Button onClick={save}>Save changes</Button>
