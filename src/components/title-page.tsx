@@ -1,6 +1,20 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronDown, ArrowUpRight, Play } from "lucide-react";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { TABS, type TabKey } from "@/lib/titles";
 import type { TitleDetail } from "@/lib/tmdb.functions";
 import { Poster } from "./bits";
@@ -74,11 +88,11 @@ export function TitlePage({ t }: { t: TitleDetail; tab?: TabKey }) {
             <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
               {t.trailerKey && (
                 <button
-                  onClick={() => setShowTrailer((v) => !v)}
+                  onClick={() => setShowTrailer(true)}
                   className="inline-flex items-center gap-1.5 rounded-md bg-secondary px-3 py-1.5 text-xs font-medium uppercase tracking-widest text-secondary-foreground hover:bg-accent"
                 >
                   <Play className="size-3.5 fill-current" />
-                  {showTrailer ? "Hide" : "Trailer"}
+                  Trailer
                 </button>
               )}
               {t.runtime && <span>{t.runtime} mins</span>}
@@ -97,8 +111,15 @@ export function TitlePage({ t }: { t: TitleDetail; tab?: TabKey }) {
           />
         </header>
         <section className="mt-7 max-w-3xl" aria-labelledby="synopsis-heading">
-          <h2 id="synopsis-heading" className="sr-only">Synopsis</h2>
-          <p className={cn("font-display text-lg leading-relaxed text-foreground/85", !about && "line-clamp-4")}>
+          <h2 id="synopsis-heading" className="sr-only">
+            Synopsis
+          </h2>
+          <p
+            className={cn(
+              "font-display text-lg leading-relaxed text-foreground/85",
+              !about && "line-clamp-4",
+            )}
+          >
             {t.overview}
           </p>
           <button
@@ -114,16 +135,53 @@ export function TitlePage({ t }: { t: TitleDetail; tab?: TabKey }) {
           <TitleActions title={t} />
           <WhereToWatch title={t} />
         </div>
-        {showTrailer && t.trailerKey && (
-          <div className="mt-5 aspect-video overflow-hidden rounded-lg bg-muted">
-            <iframe
-              className="h-full w-full"
-              src={`https://www.youtube-nocookie.com/embed/${t.trailerKey}`}
-              title={`${t.title} trailer`}
-              allow="encrypted-media; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
+        {t.trailerKey && (
+          <>
+            <div className="hidden sm:block">
+              <Dialog open={showTrailer} onOpenChange={setShowTrailer}>
+                <DialogContent className="max-w-4xl">
+                  <DialogHeader>
+                    <DialogTitle className="font-display text-2xl">{t.title} trailer</DialogTitle>
+                    <DialogDescription>
+                      Watch the trailer before joining the conversation.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="aspect-video overflow-hidden rounded-lg bg-muted">
+                    <iframe
+                      className="h-full w-full"
+                      src={`https://www.youtube-nocookie.com/embed/${t.trailerKey}`}
+                      title={`${t.title} trailer`}
+                      allow="encrypted-media; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <div className="sm:hidden">
+              <Drawer open={showTrailer} onOpenChange={setShowTrailer}>
+                <DrawerContent>
+                  <DrawerHeader>
+                    <DrawerTitle className="font-display text-2xl">{t.title} trailer</DrawerTitle>
+                    <DrawerDescription>
+                      Watch the trailer before joining the conversation.
+                    </DrawerDescription>
+                  </DrawerHeader>
+                  <div className="px-4 pb-6">
+                    <div className="aspect-video overflow-hidden rounded-lg bg-muted">
+                      <iframe
+                        className="h-full w-full"
+                        src={`https://www.youtube-nocookie.com/embed/${t.trailerKey}`}
+                        title={`${t.title} trailer`}
+                        allow="encrypted-media; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  </div>
+                </DrawerContent>
+              </Drawer>
+            </div>
+          </>
         )}
         <section className="mt-12">
           <div className="mb-5 flex items-end justify-between gap-4">

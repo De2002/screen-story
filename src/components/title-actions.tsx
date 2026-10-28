@@ -36,14 +36,27 @@ export function TitleActions({ title }: { title: TitleDetail }) {
     enabled: !!user,
     queryFn: async () => {
       if (!user) return null;
-      const { data, error } = await supabase.from("library").select("status").eq("user_id", user.id).eq("title_id", titleId).maybeSingle();
+      const { data, error } = await supabase
+        .from("library")
+        .select("status")
+        .eq("user_id", user.id)
+        .eq("title_id", titleId)
+        .maybeSingle();
       if (error) throw error;
       return (data?.status as "watched" | "want" | undefined) ?? null;
     },
   });
   const set = async (s: "watched" | "want") => {
     if (libraryBusy.current || status.isLoading || status.isError) return;
-    if (!requireAuth(s === "watched" ? "Sign in to track what you've watched" : "Sign in to build your watchlist") || !user) return;
+    if (
+      !requireAuth(
+        s === "watched"
+          ? "Sign in to track what you've watched"
+          : "Sign in to build your watchlist",
+      ) ||
+      !user
+    )
+      return;
     libraryBusy.current = true;
     setSavingLibrary(true);
     const current = status.data;
@@ -64,22 +77,55 @@ export function TitleActions({ title }: { title: TitleDetail }) {
   };
   const s = status.data;
   return (
-    <div className="flex flex-wrap gap-2">
-      <Button size="sm" disabled={savingLibrary || (!!user && (status.isLoading || status.isError))} variant={s === "watched" ? "default" : "outline"} onClick={() => set("watched")} aria-pressed={s === "watched"}>
-        {s === "watched" ? <Check /> : <Eye />} Watched
+    <div className="pointer-events-none fixed right-3 top-1/2 z-20 flex -translate-y-1/2 flex-col gap-2 sm:pointer-events-auto sm:static sm:translate-y-0 sm:flex-row sm:flex-wrap">
+      <Button
+        className="pointer-events-auto rounded-full shadow-md sm:rounded-md sm:shadow-none"
+        size="sm"
+        disabled={savingLibrary || (!!user && (status.isLoading || status.isError))}
+        variant={s === "watched" ? "default" : "outline"}
+        onClick={() => set("watched")}
+        aria-pressed={s === "watched"}
+        aria-label="Watched"
+      >
+        {s === "watched" ? <Check data-icon="inline-start" /> : <Eye data-icon="inline-start" />}{" "}
+        <span className="sr-only sm:not-sr-only">Watched</span>
       </Button>
-      <Button size="sm" disabled={savingLibrary || (!!user && (status.isLoading || status.isError))} variant={s === "want" ? "default" : "outline"} onClick={() => set("want")} aria-pressed={s === "want"}>
-        <Bookmark /> Want to watch
+      <Button
+        className="pointer-events-auto rounded-full shadow-md sm:rounded-md sm:shadow-none"
+        size="sm"
+        disabled={savingLibrary || (!!user && (status.isLoading || status.isError))}
+        variant={s === "want" ? "default" : "outline"}
+        onClick={() => set("want")}
+        aria-pressed={s === "want"}
+        aria-label="Want to watch"
+      >
+        <Bookmark data-icon="inline-start" />{" "}
+        <span className="sr-only sm:not-sr-only">Want to watch</span>
       </Button>
-      <Button size="sm" variant="outline" onClick={() => requireAuth("Sign in to make collections") && setOpen(true)}>
-        <Plus /> Add to collection
+      <Button
+        className="pointer-events-auto rounded-full shadow-md sm:rounded-md sm:shadow-none"
+        size="sm"
+        variant="outline"
+        onClick={() => requireAuth("Sign in to make collections") && setOpen(true)}
+        aria-label="Add to collection"
+      >
+        <Plus data-icon="inline-start" />{" "}
+        <span className="sr-only sm:not-sr-only">Add to collection</span>
       </Button>
       {user && <AddToCollection open={open} onOpenChange={setOpen} title={title} />}
     </div>
   );
 }
 
-function AddToCollection({ open, onOpenChange, title }: { open: boolean; onOpenChange: (o: boolean) => void; title: TitleDetail }) {
+function AddToCollection({
+  open,
+  onOpenChange,
+  title,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  title: TitleDetail;
+}) {
   const titleId = title.id;
   const { user } = useAuth();
   const [name, setName] = useState("");
@@ -91,9 +137,19 @@ function AddToCollection({ open, onOpenChange, title }: { open: boolean; onOpenC
     enabled: open && !!user,
     queryFn: async () => {
       if (!user) return [];
-      const { data, error } = await supabase.from("collections").select("id, name, collection_items(title_id)").eq("user_id", user.id).eq("removed", false).order("updated_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("collections")
+        .select("id, name, collection_items(title_id)")
+        .eq("user_id", user.id)
+        .eq("removed", false)
+        .order("updated_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []).map((c: any) => ({ id: c.id as string, name: c.name as string, has: (c.collection_items ?? []).some((i: any) => i.title_id === titleId), count: (c.collection_items ?? []).length }));
+      return (data ?? []).map((c: any) => ({
+        id: c.id as string,
+        name: c.name as string,
+        has: (c.collection_items ?? []).some((i: any) => i.title_id === titleId),
+        count: (c.collection_items ?? []).length,
+      }));
     },
   });
   const refresh = async () => {
@@ -109,12 +165,18 @@ function AddToCollection({ open, onOpenChange, title }: { open: boolean; onOpenC
     setPending(true);
     try {
       if (c.has) {
-        const { error } = await supabase.from("collection_items").delete().match({ collection_id: c.id, title_id: titleId });
+        const { error } = await supabase
+          .from("collection_items")
+          .delete()
+          .match({ collection_id: c.id, title_id: titleId });
         if (error) throw error;
       } else {
         await withTitle(title, () => addCollectionItem(c.id, titleId, c.count));
       }
-      const { error } = await supabase.from("collections").update({ updated_at: new Date().toISOString() }).eq("id", c.id);
+      const { error } = await supabase
+        .from("collections")
+        .update({ updated_at: new Date().toISOString() })
+        .eq("id", c.id);
       if (error) throw error;
     } catch {
       toast.error("Couldn't update collection. Please try again.");
@@ -130,14 +192,22 @@ function AddToCollection({ open, onOpenChange, title }: { open: boolean; onOpenC
     setPending(true);
     let created = false;
     try {
-      const { data, error } = await supabase.from("collections").insert({ name: name.trim(), slug: collectionSlug(name), user_id: user.id }).select("id").single();
+      const { data, error } = await supabase
+        .from("collections")
+        .insert({ name: name.trim(), slug: collectionSlug(name), user_id: user.id })
+        .select("id")
+        .single();
       if (error || !data) throw error ?? new Error("Collection not created");
       created = true;
       setName("");
       await withTitle(title, () => addCollectionItem(data.id, titleId, 0));
       toast.success("Added to your new collection");
     } catch {
-      toast.error(created ? "Collection created, but the title wasn't added. Please try adding it again." : "Couldn't create collection. Please try again.");
+      toast.error(
+        created
+          ? "Collection created, but the title wasn't added. Please try adding it again."
+          : "Couldn't create collection. Please try again.",
+      );
     } finally {
       await refresh();
       busy.current = false;
@@ -147,21 +217,43 @@ function AddToCollection({ open, onOpenChange, title }: { open: boolean; onOpenC
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">
-        <DialogHeader><DialogTitle className="font-display text-xl">Add to collection</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle className="font-display text-xl">Add to collection</DialogTitle>
+        </DialogHeader>
         <ul className="max-h-64 divide-y overflow-auto">
           {(lists.data ?? []).map((c) => (
             <li key={c.id}>
-              <Button variant="ghost" disabled={pending} aria-pressed={c.has} onClick={() => toggle(c)} className="h-auto w-full justify-between whitespace-normal py-2.5 text-left text-sm">
-                <span>{c.name}</span>{c.has && <Check className="size-4 text-ember" />}
+              <Button
+                variant="ghost"
+                disabled={pending}
+                aria-pressed={c.has}
+                onClick={() => toggle(c)}
+                className="h-auto w-full justify-between whitespace-normal py-2.5 text-left text-sm"
+              >
+                <span>{c.name}</span>
+                {c.has && <Check className="size-4 text-ember" />}
               </Button>
             </li>
           ))}
-          {lists.data?.length === 0 && <li className="py-2 text-sm text-muted-foreground">No collections yet.</li>}
-          {lists.isError && <li className="py-2 text-sm text-destructive">Couldn't load your collections.</li>}
+          {lists.data?.length === 0 && (
+            <li className="py-2 text-sm text-muted-foreground">No collections yet.</li>
+          )}
+          {lists.isError && (
+            <li className="py-2 text-sm text-destructive">Couldn't load your collections.</li>
+          )}
         </ul>
         <div className="flex gap-2">
-          <Input placeholder="New collection name" disabled={pending} value={name} onChange={(e) => setName(e.target.value)} maxLength={120} onKeyDown={(e) => e.key === "Enter" && create()} />
-          <Button onClick={create} disabled={pending || !name.trim()}>Create</Button>
+          <Input
+            placeholder="New collection name"
+            disabled={pending}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            maxLength={120}
+            onKeyDown={(e) => e.key === "Enter" && create()}
+          />
+          <Button onClick={create} disabled={pending || !name.trim()}>
+            Create
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
