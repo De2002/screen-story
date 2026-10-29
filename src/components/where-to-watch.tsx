@@ -28,7 +28,7 @@ export function WhereToWatch({ title }: { title: TitleDetail }) {
     "shrink-0 transition-transform hover:scale-105 focus-visible:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md";
 
   return (
-    <section aria-label={`Where to watch ${title.title}`} className="min-w-0 flex-1">
+    <section aria-label={`Where to watch ${title.title}`} className="min-w-0 basis-full sm:basis-auto sm:flex-1">
       <div className="flex items-center gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {list.map((provider) => (
           <a
