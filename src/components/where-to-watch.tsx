@@ -1,121 +1,74 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ExternalLink, Play, Radio } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+import { Play } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getWatchProviders, type TitleDetail } from "@/lib/tmdb.functions";
 
 export function WhereToWatch({ title }: { title: TitleDetail }) {
-  const [open, setOpen] = useState(false);
   const providers = useQuery({
     queryKey: ["watch-providers", title.kind, title.tmdbId],
-    enabled: true,
     queryFn: () => getWatchProviders({ data: { kind: title.kind, tmdbId: title.tmdbId } }),
   });
 
-  const options = (
-    <div className="flex flex-col gap-4 px-4 pb-8 sm:px-0 sm:pb-0">
-      {providers.isLoading && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          <Skeleton className="h-20" />
-          <Skeleton className="h-20" />
-          <Skeleton className="h-20" />
-        </div>
-      )}
-      {providers.isError && (
-        <p className="text-sm text-muted-foreground">
-          Streaming options are unavailable right now.
-        </p>
-      )}
-      {!providers.isLoading && !providers.isError && providers.data?.providers.length === 0 && (
-        <div className="flex flex-col items-center gap-2 py-6 text-center">
-          <Radio className="text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">
-            No streaming options found for this title.
-          </p>
-        </div>
-      )}
-      {!!providers.data?.providers.length && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {providers.data.providers.map((provider) => (
-            <a
-              key={provider.name}
-              href={provider.link ?? undefined}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-3 rounded-xl border bg-card p-3 transition-colors hover:bg-accent"
-            >
-              {provider.logoPath ? (
-                <img
-                  src={`https://image.tmdb.org/t/p/w92${provider.logoPath}`}
-                  alt=""
-                  className="size-10 rounded-lg"
-                />
-              ) : (
-                <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
-                  <Play />
-                </div>
-              )}
-              <span className="text-sm font-medium">{provider.name}</span>
-              <ExternalLink className="ml-auto shrink-0 text-muted-foreground" />
-            </a>
-          ))}
-        </div>
-      )}
-      {!!providers.data?.link && (
-        <a
-          href={providers.data.link}
-          target="_blank"
-          rel="noreferrer"
-          className="text-center text-xs text-muted-foreground underline underline-offset-4"
-        >
-          See all options on JustWatch
-        </a>
-      )}
-    </div>
-  );
+  const list = providers.data?.providers ?? [];
+  const link = providers.data?.link ?? null;
+
+  if (providers.isLoading) {
+    return (
+      <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden" aria-hidden>
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="size-9 shrink-0 rounded-md sm:size-10" />
+        ))}
+      </div>
+    );
+  }
+
+  if (providers.isError || list.length === 0) return null;
+
+  const itemClass =
+    "shrink-0 transition-transform hover:scale-105 focus-visible:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-md";
 
   return (
-    <>
-      <div className="hidden sm:block">
-        <section aria-labelledby="where-to-watch-heading" className="rounded-xl border bg-card p-4">
-          <h2 id="where-to-watch-heading" className="font-display text-xl">
-            Where to watch {title.title}
-          </h2>
-          <p className="mb-4 mt-1 text-sm text-muted-foreground">
-            Streaming availability from TMDB. Availability can vary by country.
-          </p>
-          {options}
-        </section>
+    <section aria-label={`Where to watch ${title.title}`} className="min-w-0 basis-full sm:basis-auto sm:flex-1">
+      <div className="flex items-center gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+        {list.map((provider) => (
+          <a
+            key={provider.name}
+            href={link ?? undefined}
+            target="_blank"
+            rel="noreferrer"
+            title={provider.name}
+            aria-label={`Watch ${title.title} on ${provider.name}`}
+            className={itemClass}
+          >
+            {provider.logoPath ? (
+              <img
+                src={`https://image.tmdb.org/t/p/w92${provider.logoPath}`}
+                alt=""
+                loading="lazy"
+                className="size-9 rounded-md bg-card object-cover ring-1 ring-border sm:size-10"
+              />
+            ) : (
+              <span className="flex size-9 items-center justify-center rounded-md bg-muted text-muted-foreground ring-1 ring-border sm:size-10">
+                <Play className="size-4 fill-current" />
+              </span>
+            )}
+          </a>
+        ))}
+        {link && (
+          <a
+            href={link}
+            target="_blank"
+            rel="noreferrer"
+            className={`${itemClass} flex size-9 items-center justify-center rounded-md bg-secondary text-secondary-foreground ring-1 ring-border sm:size-10`}
+            aria-label="See all watching options on JustWatch"
+            title="See all options"
+          >
+            <span aria-hidden className="text-[10px] font-semibold uppercase tracking-widest">
+              All
+            </span>
+          </a>
+        )}
       </div>
-      <div className="sm:hidden">
-        <Drawer open={open} onOpenChange={setOpen}>
-          <DrawerTrigger asChild>
-            <Button size="sm" variant="outline">
-              <Play data-icon="inline-start" /> Where to watch
-            </Button>
-          </DrawerTrigger>
-          <DrawerContent>
-            <DrawerHeader className="mx-auto w-full max-w-2xl px-4">
-              <DrawerTitle className="font-display text-2xl">
-                Where to watch {title.title}
-              </DrawerTitle>
-              <DrawerDescription>
-                Streaming availability from TMDB. Availability can vary by country.
-              </DrawerDescription>
-            </DrawerHeader>
-            {options}
-          </DrawerContent>
-        </Drawer>
-      </div>
-    </>
+    </section>
   );
 }
