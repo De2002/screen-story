@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { ChevronDown, ArrowUpRight, Play } from "lucide-react";
+import { ChevronDown, Play } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -15,44 +14,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { TABS, type TabKey } from "@/lib/titles";
+import { type TabKey } from "@/lib/titles";
 import type { TitleDetail } from "@/lib/tmdb.functions";
 import { Poster } from "./bits";
 import { TitleActions } from "./title-actions";
 import { WhereToWatch } from "./where-to-watch";
 import { cn } from "@/lib/utils";
-
-const sectionCopy: Record<string, { intro: string; tone: string }> = {
-  lessons: {
-    intro: "What this story leaves us thinking about life, people, and society.",
-    tone: "border-amber-800/40 bg-amber-950/35 hover:bg-amber-950/50",
-  },
-  quotes: {
-    intro: "The lines that stayed with us long after the credits rolled.",
-    tone: "border-sky-800/40 bg-sky-950/35 hover:bg-sky-950/50",
-  },
-  reviews: {
-    intro: "Personal responses and critical takes from people who watched it.",
-    tone: "border-rose-800/40 bg-rose-950/35 hover:bg-rose-950/50",
-  },
-  questions: {
-    intro: "The things this story makes us curious enough to ask out loud.",
-    tone: "border-violet-800/40 bg-violet-950/35 hover:bg-violet-950/50",
-  },
-  moments: {
-    intro: "Scenes, events, and turning points that changed the way we saw the story.",
-    tone: "border-emerald-800/40 bg-emerald-950/35 hover:bg-emerald-950/50",
-  },
-  director: {
-    intro: "Messages, observations, and questions addressed to the filmmaker.",
-    tone: "border-orange-800/40 bg-orange-950/35 hover:bg-orange-950/50",
-  },
-};
+import { SectionIndex } from "./section-index";
 
 export function TitlePage({ t }: { t: TitleDetail; tab?: TabKey }) {
   const [about, setAbout] = useState(false);
   const [showTrailer, setShowTrailer] = useState(false);
-  const sections = TABS.filter((x) => x.key !== "trailer");
 
   return (
     <div>
@@ -189,50 +161,8 @@ export function TitlePage({ t }: { t: TitleDetail; tab?: TabKey }) {
               <p className="text-xs uppercase tracking-[0.22em] text-ember">The conversation</p>
               <h2 className="mt-1 font-display text-3xl">Go deeper</h2>
             </div>
-            <p className="hidden max-w-xs text-right text-sm text-muted-foreground sm:block">
-              Choose a thread and see what other viewers took from {t.title}.
-            </p>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {sections.map((section) => {
-              const copy = sectionCopy[section.key];
-              const path = t.kind === "movie" ? "/movie/$slug/$section" : "/series/$slug/$section";
-              return (
-                <Link
-                  key={section.key}
-                  to={path}
-                  params={{ slug: t.slug, section: section.key }}
-                  className={cn(
-                    "group rounded-2xl border p-5 transition-transform hover:-translate-y-0.5 hover:border-foreground/30",
-                    copy.tone,
-                  )}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="font-display text-2xl">{section.label}</h3>
-                      <p className="mt-2 max-w-sm text-sm leading-relaxed text-foreground/70">
-                        {section.key === "reviews"
-                          ? "Personal opinions and critical assessments."
-                          : section.key === "questions"
-                            ? "Questions viewers want to explore or discuss."
-                            : section.key === "lessons"
-                              ? "What the story teaches us about life, people, or society."
-                              : section.key === "quotes"
-                                ? "Memorable dialogue from the story."
-                                : section.key === "moments"
-                                  ? "Memorable scenes, events, and turning points."
-                                  : "Messages, observations, or questions for the filmmaker."}
-                      </p>
-                    </div>
-                    <ArrowUpRight className="size-5 shrink-0 text-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </div>
-                  <p className="mt-5 text-xs font-medium uppercase tracking-widest text-foreground/50">
-                    Open {section.label}
-                  </p>
-                </Link>
-              );
-            })}
-          </div>
+          <SectionIndex title={t} />
         </section>
       </main>
     </div>

@@ -102,3 +102,85 @@
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
 }
+
+.section-index {
+  display: grid;
+  grid-template-columns: 1.4fr 1.1fr 0.8fr 1fr;
+  grid-template-rows: repeat(3, 112px);
+  grid-template-areas:
+    "lessons lessons quotes moments"
+    "reviews reviews quotes moments"
+    "questions director director moments";
+  gap: 1px;
+  border: 1px solid var(--border);
+  background: var(--border);
+}
+
+.section-index-tile {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-width: 0;
+  padding: 22px;
+  color: var(--foreground);
+  background: var(--card);
+  transition: background-color 180ms ease;
+}
+.section-index-tile:hover { background: var(--accent); }
+.section-index-tile:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -4px;
+  z-index: 1;
+}
+.section-index-number {
+  position: absolute;
+  top: 18px;
+  left: 22px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+.section-index-label {
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+.section-index-arrow {
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  color: var(--muted-foreground);
+}
+.section-index-lessons { grid-area: lessons; background: var(--ember-soft); }
+.section-index-lessons:hover { background: color-mix(in oklab, var(--ember-soft) 80%, var(--ember)); }
+.section-index-lessons .section-index-label { font-size: 38px; }
+.section-index-quotes { grid-area: quotes; justify-content: center; padding-bottom: 24px; }
+.section-index-quotes .section-index-label { writing-mode: vertical-rl; transform: rotate(180deg); }
+.section-index-reviews { grid-area: reviews; background: var(--secondary); }
+.section-index-questions { grid-area: questions; }
+.section-index-questions .section-index-label { font-size: 26px; }
+.section-index-moments { grid-area: moments; background: var(--secondary); justify-content: center; padding-bottom: 24px; }
+.section-index-moments .section-index-label { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 38px; }
+.section-index-director { grid-area: director; }
+.section-index-director .section-index-label { font-size: 26px; }
+
+@media (max-width: 639px) {
+  .section-index {
+    grid-template-columns: 0.85fr 1.15fr 0.85fr;
+    grid-template-rows: repeat(4, 100px);
+    grid-template-areas:
+      "lessons lessons quotes"
+      "reviews reviews quotes"
+      "moments questions questions"
+      "moments director director";
+  }
+  .section-index-tile { padding: 16px; }
+  .section-index-number { top: 13px; left: 16px; }
+  .section-index-arrow { top: 13px; right: 12px; width: 16px; height: 16px; }
+  .section-index-label { font-size: 28px; }
+  .section-index-lessons .section-index-label { font-size: 32px; }
+  .section-index-moments .section-index-label { font-size: 30px; }
+  .section-index-questions .section-index-label,
+  .section-index-director .section-index-label { font-size: 23px; }
+}
