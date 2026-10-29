@@ -9,6 +9,7 @@ import { FeedSkeleton, PostFeed, QuestionList, ReviewList } from "@/components/f
 import { CollectionsGrid } from "@/components/collections";
 import { LibraryGrid } from "@/components/library-grid";
 import { cn } from "@/lib/utils";
+import { ProfileFavourites } from "@/components/profile-favourites";
 
 export const Route = createFileRoute("/u/$username")({
   head: ({ params }) => ({
@@ -52,6 +53,7 @@ function Profile() {
         </div>
       </div>
       {p.bio && <p className="mt-4 text-[15px] leading-relaxed">{p.bio}</p>}
+      <ProfileFavourites userId={p.id} />
       <div className="no-scrollbar mt-6 flex gap-1 overflow-x-auto border-b">
         {TABS.map((t) => (
           <button key={t} onClick={() => setTab(t)} className={cn("whitespace-nowrap border-b-2 px-3 py-3 text-sm", t === tab ? "border-ember font-medium" : "border-transparent text-muted-foreground")}>{t}</button>

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { BackdropPicker } from "@/components/backdrop-picker";
+import { ProfileFavourites } from "@/components/profile-favourites";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -104,6 +105,7 @@ function Settings() {
           />
         </div>
         <div className="space-y-1.5"><Label htmlFor="b">About you</Label><Textarea id="b" value={f.bio} maxLength={300} onChange={(e) => setF({ ...f, bio: e.target.value })} /></div>
+        {profile && <ProfileFavourites userId={profile.id} editable />}
         <Button onClick={save}>Save changes</Button>
       </div>
     </Page>
