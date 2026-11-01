@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Home, Compass, Search, Library, User, LogOut, Settings, Shield } from "lucide-react";
-import scruttinLogo from "@/assets/scruttin-logo.png.asset.json";
+import scruttinLogo from "@/assets/scruttin-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
