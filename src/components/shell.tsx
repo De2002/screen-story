@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Home, Compass, Search, Library, User, LogOut, Settings, Shield } from "lucide-react";
-import scruttinLogo from "@/assets/scruttin-logo.png.asset.json";
+import scruttinLogo from "@/assets/scruttin-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ const NAV = [
 export function Wordmark() {
   return (
     <Link to="/" className="flex items-center gap-2.5">
-      <img src={scruttinLogo.url} alt="Scruttin logo" width={678} height={678} className="size-8 rounded-md" />
+      <img src={scruttinLogo} alt="Scruttin logo" width={678} height={678} className="size-8 rounded-md" />
       <span className="font-display text-2xl tracking-tight text-foreground">Scruttin<span className="text-ember">.</span></span>
     </Link>
   );
