@@ -17,8 +17,15 @@ const NAV = [
   { to: "/collections", label: "Collections", icon: Library },
 ] as const;
 
+import scruttinLogo from "@/assets/scruttin-logo.png.asset.json";
+
 export function Wordmark() {
-  return <Link to="/" className="font-display text-2xl tracking-tight text-foreground">Scruttin<span className="text-ember">.</span></Link>;
+  return (
+    <Link to="/" className="flex items-center gap-2.5">
+      <img src={scruttinLogo.url} alt="Scruttin logo" width={678} height={678} className="size-7 rounded-md" />
+      <span className="font-display text-2xl tracking-tight text-foreground">Scruttin<span className="text-ember">.</span></span>
+    </Link>
+  );
 }
 
 function AccountMenu() {
