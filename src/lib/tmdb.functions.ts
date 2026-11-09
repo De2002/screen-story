@@ -236,3 +236,37 @@ export const ensureTitles = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+export type ReelItem = TitleSummary & {
+  trailerKey: string;
+  genres: string[];
+  cast: { name: string; character: string; profilePath: string | null }[];
+};
+
+export const getTrailerReel = createServerFn({ method: "GET" })
+  .inputValidator((d) => z.object({ page: z.number().int().min(1).max(20).default(1) }).parse(d))
+  .handler(async ({ data }) => {
+    try {
+      const list = await tmdb("/trending/all/week", { page: data.page });
+      const items = ((list.results ?? []).map((x: any) => toSummary(x)).filter(Boolean) as TitleSummary[]).slice(0, 12);
+      const out = await Promise.all(items.map(async (s) => {
+        try {
+          const r = await tmdb(s.kind === "movie" ? `/movie/${s.tmdbId}` : `/tv/${s.tmdbId}`, { append_to_response: "credits,videos" });
+          const vids = (r.videos?.results ?? []).filter((v: any) => v.site === "YouTube");
+          const t = vids.find((v: any) => v.type === "Trailer" && v.official) ?? vids.find((v: any) => v.type === "Trailer") ?? vids[0];
+          if (!t) return null;
+          return {
+            ...s,
+            overview: r.overview || s.overview,
+            trailerKey: t.key as string,
+            genres: (r.genres ?? []).map((g: any) => g.name as string).slice(0, 3),
+            cast: (r.credits?.cast ?? []).slice(0, 10).map((c: any) => ({ name: c.name, character: c.character ?? "", profilePath: c.profile_path ?? null })),
+          } as ReelItem;
+        } catch { return null; }
+      }));
+      return out.filter(Boolean) as ReelItem[];
+    } catch (e) {
+      console.error(e);
+      return [] as ReelItem[];
+    }
+  });
