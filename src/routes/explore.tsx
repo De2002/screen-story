@@ -86,7 +86,7 @@ function Explore() {
     const root = feed.current;
     if (!root) return;
     const io = new IntersectionObserver((es) => {
-      for (const e of es) if (e.isIntersecting) setActive((e.target as HTMLElement).dataset.id ?? null);
+      for (const e of es) if (e.isIntersecting) setActive((e.target as HTMLElement).dataset["id"] ?? null);
     }, { root, threshold: 0.6 });
     root.querySelectorAll<HTMLElement>("[data-id]").forEach((el) => io.observe(el));
     return () => io.disconnect();
